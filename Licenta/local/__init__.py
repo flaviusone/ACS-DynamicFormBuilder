@@ -1,1 +1,0 @@
-/home/ressurected/Projects/Django/Licenta/Licenta/__init__.py

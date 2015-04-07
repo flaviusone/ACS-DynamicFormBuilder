@@ -1,0 +1,23 @@
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+Meta	api.py	/^    class Meta:$/;"	c	class:PostResource
+PostResource	api.py	/^class PostResource(ModelResource):$/;"	c
+queryset	api.py	/^        queryset = Post.objects.all()$/;"	v	class:PostResource.Meta
+resource_name	api.py	/^        resource_name = 'post'/;"	v	class:PostResource.Meta
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+Meta	models.py	/^    class Meta:$/;"	c	class:Post
+Post	models.py	/^class Post(models.Model):$/;"	c
+__str__	models.py	/^    def __str__(self):$/;"	m	class:Post	file:
+__unicode__	models.py	/^    def __unicode__(self):$/;"	m	class:Post	file:
+author	models.py	/^    author = models.ForeignKey(User)$/;"	v	class:Post
+content	models.py	/^    content = models.TextField()$/;"	v	class:Post
+created_at	models.py	/^    created_at = models.DateTimeField(auto_now_add=True)$/;"	v	class:Post
+save	models.py	/^    def save(self):$/;"	m	class:Post
+title	models.py	/^    title = models.CharField(max_length=200)$/;"	v	class:Post
+verbose_name	models.py	/^        verbose_name = "Post"$/;"	v	class:Post.Meta
+verbose_name_plural	models.py	/^        verbose_name_plural = "Posts"$/;"	v	class:Post.Meta
+urlpatterns	urls.py	/^urlpatterns = patterns('',$/;"	v
+index	views.py	/^def index(request):$/;"	f
