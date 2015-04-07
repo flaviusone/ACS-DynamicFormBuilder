@@ -1,0 +1,1 @@
+/home/ressurected/Projects/Django/Licenta/Licenta/settings.py
