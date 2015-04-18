@@ -3,5 +3,7 @@ from django.http import HttpResponse
 
 
 def index(request):
-    return HttpResponse("Nanu says WOLOLO")
+    # return HttpResponse("Nanu says WOLOLO")
+    context_dict = {'boldmessage': "Testing WOLOLO"}
+    return render(request, 'posts/index.html', context_dict)
 # Create your views here.

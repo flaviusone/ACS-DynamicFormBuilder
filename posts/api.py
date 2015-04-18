@@ -3,6 +3,7 @@ from posts.models import Post
 
 
 class PostResource(ModelResource):
+
     class Meta:
         queryset = Post.objects.all()
         resource_name = 'post'
