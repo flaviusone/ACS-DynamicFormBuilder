@@ -4,19 +4,20 @@
 
 <html>
 
-    <head>
-        <title>Licenta</title>
-        <script type="text/javascript" src='{% static 'jquery/dist/jquery.js' %}'></script>
-        <script type="text/javascript" src='{% static 'react/react.js' %}'></script>
-        <script type="text/javascript" src='{% static 'react/JSXTransformer.js' %}'></script>
+<head>
+  <title>Licenta</title>
+  <link rel="stylesheet" type="text/css" href="{% static "bootstrap/dist/css/bootstrap.css" %}" />
+  <script type="text/javascript" src='{% static 'react/react.js' %}'></script>
+  <script type="text/javascript" src='{% static 'react/JSXTransformer.js' %}'></script>
+</head>
 
-        <script src="{% static "js/main.js" %}"></script> <!-- JavaScript -->
-        <script type="text/jsx" src="{% static "js/react_code.js" %}"></script> <!-- JavaScript -->
-    </head>
+<body>
+  <div id="content" class="container" align="center"></div>
 
-    <body>
-        <div id="content" align="center"></div>
+  <script type="text/jsx" src="{% static "js/react_code.js" %}"></script> <!-- JavaScript -->
+  <script type="text/javascript" src='{% static 'jquery/dist/jquery.js' %}'></script>
+  <script src="{% static "js/main.js" %}"></script> <!-- JavaScript -->
 
-    </body>
+</body>
 
 </html>

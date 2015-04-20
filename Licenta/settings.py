@@ -113,6 +113,7 @@ BOWER_INSTALLED_APPS = (
     'underscore',
     'lodash',
     'react',
+    'bootstrap',
 )
 
 # Static files (CSS, JavaScript, Images)

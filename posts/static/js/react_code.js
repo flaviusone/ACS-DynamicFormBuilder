@@ -46,13 +46,13 @@ var FormList = React.createClass({
     var formNodes = this.props.data.objects.map(function (object) {
       return (
         <GenericForm title={object.title} created_at={object.created_at}>
-          {object.content}
+        {object.content}
         </GenericForm>
-      );
+        );
     });
     return (
-      <div className="FormList">
-        {formNodes}
+      <div className="row FormList">
+      {formNodes}
       </div>
       );
   }
@@ -65,10 +65,16 @@ var FormList = React.createClass({
 var GenericForm = React.createClass({
   render: function() {
     return (
-      <div className="GenericForm">
-      <h2>{this.props.title}</h2>
-      <p>{this.props.children}</p>
-      <h5>{this.props.created_at}</h5>
+      <div className="col-md-4">
+        <div className="panel panel-default GenericForm">
+            <div className="panel-heading">
+                <h3 className="panel-title">{this.props.title}</h3>
+            </div>
+            <div className="panel-body">
+                {this.props.children}
+            </div>
+            <h5>{this.props.created_at}</h5>
+        </div>
       </div>
       );
   }
@@ -94,5 +100,5 @@ var AddForm = React.createClass({
 React.render(
   <FormBox url='http://localhost:8000/posts/api/post/'/>,
   document.getElementById('content')
-);
+  );
 
