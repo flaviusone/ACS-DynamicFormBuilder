@@ -7,7 +7,7 @@
 **/
 var FormBox = React.createClass({
   getInitialState: function() {
-    return {data: []};
+    return {data: {objects: []}};
   },
   loadCommentsFromServer: function() {
     $.ajax({
@@ -30,7 +30,7 @@ var FormBox = React.createClass({
     return (
       <div className="formBox">
       <h1> Dynamic Form Builder Version 0.1 </h1>
-      <FormList data={this.state.date}/>
+      <FormList data={this.state.data}/>
       <AddForm />
       </div>
       );
@@ -38,31 +38,21 @@ var FormBox = React.createClass({
 });
 
 /**
-* Container for GenericForm objects
+* List Container for GenericForm objects
 **/
 var FormList = React.createClass({
   render: function() {
+    // var formNodes;
+    var formNodes = this.props.data.objects.map(function (object) {
+      return (
+        <GenericForm title={object.title} created_at={object.created_at}>
+          {object.content}
+        </GenericForm>
+      );
+    });
     return (
       <div className="FormList">
-      I am the form list
-      <GenericForm />
-      <GenericForm />
-      <GenericForm />
-      <GenericForm />
-      <GenericForm />
-      </div>
-      );
-  }
-});
-
-/**
-* Add new GenericForm - TODO
-**/
-var AddForm = React.createClass({
-  render: function() {
-    return (
-      <div className="AddForm">
-      I am AddForm!
+        {formNodes}
       </div>
       );
   }
@@ -76,7 +66,25 @@ var GenericForm = React.createClass({
   render: function() {
     return (
       <div className="GenericForm">
-      I am GenericForm
+      <h2>{this.props.title}</h2>
+      <p>{this.props.children}</p>
+      <h5>{this.props.created_at}</h5>
+      </div>
+      );
+  }
+});
+
+
+
+/*-----  Unimplemented  ------*/
+/**
+* Add new GenericForm - TODO
+**/
+var AddForm = React.createClass({
+  render: function() {
+    return (
+      <div className="AddForm">
+      I am AddForm - UNIMPLEMENTED!
       </div>
       );
   }
@@ -86,4 +94,5 @@ var GenericForm = React.createClass({
 React.render(
   <FormBox url='http://localhost:8000/posts/api/post/'/>,
   document.getElementById('content')
-  );
+);
+

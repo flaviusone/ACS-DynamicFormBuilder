@@ -1,5 +1,3 @@
-console.log('Js is working inside');
-
 (function() {
   $.ajax({
     url: 'http://localhost:8000/posts/api/post/',
@@ -7,7 +5,7 @@ console.log('Js is working inside');
     contentType: 'application/json',
     dataType: 'json',
     success: function(data, textStatus, jqXHR) {
-      console.log(data);
+      // console.log(data);
     },
   })
 })();
