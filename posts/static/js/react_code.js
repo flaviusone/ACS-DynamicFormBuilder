@@ -23,6 +23,20 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
+  handleCommentSubmit: function(object) {
+    $.ajax({
+      url: this.props.url,
+      dataType: 'json',
+      type: 'POST',
+      data: object,
+      success: function(data) {
+        this.setState({data: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
   componentDidMount: function() {
     this.loadCommentsFromServer();
   },
@@ -31,7 +45,7 @@ var FormBox = React.createClass({
       <div className="formBox">
       <h1> Dynamic Form Builder Version 0.1 </h1>
       <FormList data={this.state.data}/>
-      <AddForm />
+      <AddForm onFormSubmit={this.handleCommentSubmit}/>
       </div>
       );
   }
@@ -87,11 +101,25 @@ var GenericForm = React.createClass({
 * Add new GenericForm - TODO
 **/
 var AddForm = React.createClass({
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var title = React.findDOMNode(this.refs.title).value.trim();
+    var content = React.findDOMNode(this.refs.content).value.trim();
+    if (!content || !title) {
+      return;
+    }
+    this.props.onFormSubmit({title: title, content: content});
+    React.findDOMNode(this.refs.title).value = '';
+    React.findDOMNode(this.refs.content).value = '';
+    return;
+  },
   render: function() {
     return (
-      <div className="AddForm">
-      I am AddForm - UNIMPLEMENTED!
-      </div>
+      <form className="commentForm" onSubmit={this.handleSubmit}>
+        <input type="text" placeholder="Title" ref="title" />
+        <input type="text" placeholder="Content" ref="content" />
+        <input type="submit" value="Add" />
+      </form>
       );
   }
 });
