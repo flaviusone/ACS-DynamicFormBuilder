@@ -61,7 +61,7 @@ var FormList = React.createClass({
     // var formNodes;
     var formNodes = this.props.data.objects.map(function (object) {
       return (
-        <GenericForm title={object.title} created_at={object.created_at} author={object.author}>
+        <GenericForm title={object.title} created_at={object.created_at} author={object.author} url={object.resource_uri}>
         {object.content}
         </GenericForm>
         );
@@ -79,27 +79,52 @@ var FormList = React.createClass({
 * Generic form object
 **/
 var GenericForm = React.createClass({
-  render: function() {
-    var date = new Date(this.props.created_at)
 
-    return (
-      <div className="col-md-4">
-        <div className="panel panel-default GenericForm">
-            <div className="panel-heading">
-                <div className="row">
-                  <h3 className="col-md-8 panel-title">{this.props.title}</h3>
-                  <button type="button" className="col-md-3 btn btn-default">Edit</button>
-                </div>
-            </div>
-            <div className="panel-body">
-                {this.props.children}
-            </div>
-            <h5>Author: {this.props.author}</h5>
-            <h5>{date.toUTCString()}</h5>
-        </div>
-      </div>
-      );
-  }
+
+  unmount: function() {
+    var node = this.getDOMNode();
+    React.unmountComponentAtNode(node);
+    $(node).remove();
+  },
+  deleteRequest: function() {
+   $.ajax({
+     url: this.props.url,
+     type: 'DELETE',
+     dataType: 'json',
+     data:{},
+     success: function (data, textStatus, xhr) {
+
+     },
+     error: function (xhr, textStatus, errorThrown) {
+       console.log('Error in Delete operation');
+     }
+   });
+ },
+ handleClick: function() {
+    this.deleteRequest();
+    this.unmount();
+},
+render: function() {
+  var date = new Date(this.props.created_at);
+  return (
+    <div className="col-md-4">
+    <div className="panel panel-default GenericForm">
+    <div className="panel-heading">
+    <div className="row">
+    <h3 className="col-md-6 panel-title">{this.props.title}</h3>
+    <button type="button" className="col-md-3 btn btn-default">Edit</button>
+    <button type="button" onClick={this.handleClick} className="col-md-3 btn btn-default">Delete</button>
+    </div>
+    </div>
+    <div className="panel-body">
+    {this.props.children}
+    </div>
+    <h5>Author: {this.props.author}</h5>
+    <h5>{date.toUTCString()}</h5>
+    </div>
+    </div>
+    );
+}
 });
 
 
@@ -124,9 +149,9 @@ var AddForm = React.createClass({
   render: function() {
     return (
       <form className="commentForm" onSubmit={this.handleSubmit}>
-        <input type="text" placeholder="Title" ref="title" />
-        <input type="text" placeholder="Content" ref="content" />
-        <input type="submit" value="Add" />
+      <input type="text" placeholder="Title" ref="title" />
+      <input type="text" placeholder="Content" ref="content" />
+      <input type="submit" value="Add" />
       </form>
       );
   }
