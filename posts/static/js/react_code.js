@@ -27,6 +27,7 @@ var FormBox = React.createClass({
     $.ajax({
       url: this.props.url,
       dataType: 'json',
+      contentType: 'application/json',
       type: 'POST',
       data: object,
       success: function(data) {
@@ -59,7 +60,7 @@ var FormList = React.createClass({
     // var formNodes;
     var formNodes = this.props.data.objects.map(function (object) {
       return (
-        <GenericForm title={object.title} created_at={object.created_at}>
+        <GenericForm title={object.title} created_at={object.created_at} author={object.author}>
         {object.content}
         </GenericForm>
         );
@@ -87,6 +88,7 @@ var GenericForm = React.createClass({
             <div className="panel-body">
                 {this.props.children}
             </div>
+            <h5>Author: {this.props.author}</h5>
             <h5>{this.props.created_at}</h5>
         </div>
       </div>
