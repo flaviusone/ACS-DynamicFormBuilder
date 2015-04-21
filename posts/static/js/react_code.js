@@ -45,8 +45,9 @@ var FormBox = React.createClass({
     return (
       <div className="formBox">
       <h1> Dynamic Form Builder Version 0.1 </h1>
-      <FormList data={this.state.data}/>
       <AddForm onFormSubmit={this.handleCommentSubmit}/>
+      <br></br>
+      <FormList data={this.state.data}/>
       </div>
       );
   }
@@ -79,17 +80,22 @@ var FormList = React.createClass({
 **/
 var GenericForm = React.createClass({
   render: function() {
+    var date = new Date(this.props.created_at)
+
     return (
       <div className="col-md-4">
         <div className="panel panel-default GenericForm">
             <div className="panel-heading">
-                <h3 className="panel-title">{this.props.title}</h3>
+                <div className="row">
+                  <h3 className="col-md-8 panel-title">{this.props.title}</h3>
+                  <button type="button" className="col-md-3 btn btn-default">Edit</button>
+                </div>
             </div>
             <div className="panel-body">
                 {this.props.children}
             </div>
             <h5>Author: {this.props.author}</h5>
-            <h5>{this.props.created_at}</h5>
+            <h5>{date.toUTCString()}</h5>
         </div>
       </div>
       );
