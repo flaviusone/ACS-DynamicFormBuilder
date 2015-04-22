@@ -1,10 +1,16 @@
 from django.conf.urls import patterns, include, url
 from posts import views
-from posts.api import PostResource
+from posts.api import PostResource, UserResource
+from tastypie.api import Api
 
 post_resource = PostResource()
+author_resource = UserResource()
+
+v1_api = Api(api_name='v1')
+v1_api.register(post_resource)
+v1_api.register(author_resource)
 
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
-    url(r'^api/', include(post_resource.urls)),
+    url(r'^api/', include(v1_api.urls)),
 )

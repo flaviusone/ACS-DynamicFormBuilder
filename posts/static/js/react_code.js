@@ -24,12 +24,13 @@ var FormBox = React.createClass({
     });
   },
   handleCommentSubmit: function(object) {
+    // console.log(object);
     $.ajax({
       url: this.props.url,
+      type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
-      type: 'POST',
-      data: object,
+      data: JSON.stringify(object),
       success: function(data) {
         this.setState({data: data});
       }.bind(this),
@@ -141,7 +142,7 @@ var AddForm = React.createClass({
     if (!content || !title) {
       return;
     }
-    this.props.onFormSubmit({title: title, content: content});
+    this.props.onFormSubmit({author: "/posts/api/v1/author/1/",content: content, title: title});
     React.findDOMNode(this.refs.title).value = '';
     React.findDOMNode(this.refs.content).value = '';
     return;
@@ -159,7 +160,7 @@ var AddForm = React.createClass({
 
 
 React.render(
-  <FormBox url='http://localhost:8000/posts/api/post/'/>,
+  <FormBox url='http://localhost:8000/posts/api/v1/post/'/>,
   document.getElementById('content')
   );
 
