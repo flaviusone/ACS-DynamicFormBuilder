@@ -1,9 +1,9 @@
 from tastypie.resources import ModelResource
 from posts.models import Post
-from tastypie import fields, utils
+from tastypie import fields
 from tastypie.authorization import Authorization
 from django.contrib.auth.models import User
-from tastypie.resources import ALL, ALL_WITH_RELATIONS
+from tastypie.resources import ALL
 
 
 class UserResource(ModelResource):

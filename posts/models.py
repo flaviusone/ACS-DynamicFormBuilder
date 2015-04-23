@@ -1,16 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
-from tastypie.utils.timezone import now
+# from tastypie.utils.timezone import now
 # Create your models here.
 
 
 class Post(models.Model):
     # TODO: Define fields here
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, help_text='Title: ')
     author = models.ForeignKey(User)
-    created_at = models.DateTimeField(auto_now_add=True)
-    content = models.TextField()
-
+    created_at = models.DateTimeField(
+        auto_now_add=True, help_text='Created at: ')
+    content = models.TextField(help_text='Content: ')
 
     class Meta:
         verbose_name = "Post"
