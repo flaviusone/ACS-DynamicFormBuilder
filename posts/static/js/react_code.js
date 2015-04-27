@@ -99,36 +99,33 @@ var GenericForm = React.createClass({
        console.log('Error in Delete operation');
      }
    });
- },
- handleClick: function() {
-  this.deleteRequest();
-  this.unmount();
-},
-render: function() {
-  var date = new Date(this.props.created_at);
-  return (
-    <div className="col-md-4">
-      <div className="panel panel-default GenericForm">
-        <div className="panel-heading">
-          <div className="row">
-            <button type="button" className="col-md-6 btn btn-default">Edit</button>
-            <button type="button" onClick={this.handleClick} className="col-md-6 btn btn-default">Delete</button>
+  },
+  handleClick: function() {
+    this.deleteRequest();
+    this.unmount();
+  },
+  render: function() {
+    var date = new Date(this.props.created_at);
+    return (
+      <div className="col-md-4">
+        <div className="panel panel-default GenericForm">
+          <div className="panel-heading">
+            <div className="row">
+              <button type="button" className="col-md-6 btn btn-default">Edit</button>
+              <button type="button" onClick={this.handleClick} className="col-md-6 btn btn-default">Delete</button>
+            </div>
+          </div>
+          <div className="panel-body">
+          Placeholder
           </div>
         </div>
-        <div className="panel-body">
-        Placeholder
-        </div>
       </div>
-    </div>
-    );
-}
+      );
+  }
 });
 
-
-
-/*-----  Unimplemented  ------*/
 /**
-* Add new GenericForm - TODO
+* Add new GenericForm
 **/
 var AddForm = React.createClass({
   handleSubmit: function(e) {
