@@ -45,10 +45,10 @@ var FormBox = React.createClass({
   render: function() {
     return (
       <div className="formBox">
-      <h1> Dynamic Form Builder Version 0.1 </h1>
-      <AddForm onFormSubmit={this.handleCommentSubmit}/>
-      <br></br>
-      <FormList data={this.state.data}/>
+        <h1> Dynamic Form Builder Version 0.1 </h1>
+        <AddForm onFormSubmit={this.handleCommentSubmit}/>
+        <br></br>
+        <FormList data={this.state.data}/>
       </div>
       );
   }
@@ -62,8 +62,8 @@ var FormList = React.createClass({
     // var formNodes;
     var formNodes = this.props.data.objects.map(function (object) {
       return (
-        <GenericForm title={object.title} created_at={object.created_at} author={object.author} url={object.resource_uri}>
-        {object.content}
+        <GenericForm>
+
         </GenericForm>
         );
     });
@@ -80,7 +80,6 @@ var FormList = React.createClass({
 * Generic form object
 **/
 var GenericForm = React.createClass({
-
 
   unmount: function() {
     var node = this.getDOMNode();
@@ -102,27 +101,24 @@ var GenericForm = React.createClass({
    });
  },
  handleClick: function() {
-    this.deleteRequest();
-    this.unmount();
+  this.deleteRequest();
+  this.unmount();
 },
 render: function() {
   var date = new Date(this.props.created_at);
   return (
     <div className="col-md-4">
-    <div className="panel panel-default GenericForm">
-    <div className="panel-heading">
-    <div className="row">
-    <h3 className="col-md-6 panel-title">{this.props.title}</h3>
-    <button type="button" className="col-md-3 btn btn-default">Edit</button>
-    <button type="button" onClick={this.handleClick} className="col-md-3 btn btn-default">Delete</button>
-    </div>
-    </div>
-    <div className="panel-body">
-    {this.props.children}
-    </div>
-    <h5>Author: {this.props.author}</h5>
-    <h5>{date.toUTCString()}</h5>
-    </div>
+      <div className="panel panel-default GenericForm">
+        <div className="panel-heading">
+          <div className="row">
+            <button type="button" className="col-md-6 btn btn-default">Edit</button>
+            <button type="button" onClick={this.handleClick} className="col-md-6 btn btn-default">Delete</button>
+          </div>
+        </div>
+        <div className="panel-body">
+        Placeholder
+        </div>
+      </div>
     </div>
     );
 }
@@ -150,9 +146,9 @@ var AddForm = React.createClass({
   render: function() {
     return (
       <form className="commentForm" onSubmit={this.handleSubmit}>
-      <input type="text" placeholder="Title" ref="title" />
-      <input type="text" placeholder="Content" ref="content" />
-      <input type="submit" value="Add" />
+        <input type="text" placeholder="Title" ref="title" />
+        <input type="text" placeholder="Content" ref="content" />
+        <input type="submit" value="Add" />
       </form>
       );
   }
