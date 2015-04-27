@@ -7,16 +7,31 @@
 **/
 var FormBox = React.createClass({
   getInitialState: function() {
-    return {data: {objects: []}};
+    return {resource: {objects: []},
+            schema: {fields: {}}};
   },
   loadCommentsFromServer: function() {
+    // Load resource
     $.ajax({
       url: this.props.url,
       type: 'GET',
       contentType: 'application/json',
       dataType: 'json',
       success: function(data, textStatus, jqXHR) {
-        this.setState({data: data});
+        this.setState({resource: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+    // Load schema
+    $.ajax({
+      url: this.props.url + 'schema',
+      type: 'GET',
+      contentType: 'application/json',
+      dataType: 'json',
+      success: function(data, textStatus, jqXHR) {
+        this.setState({schema: data});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -24,7 +39,6 @@ var FormBox = React.createClass({
     });
   },
   handleCommentSubmit: function(object) {
-    // console.log(object);
     $.ajax({
       url: this.props.url,
       type: 'POST',
@@ -32,14 +46,14 @@ var FormBox = React.createClass({
       contentType: 'application/json',
       data: JSON.stringify(object),
       success: function(data) {
-        this.setState({data: data});
+        this.setState({resource: data});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
   },
-  componentDidMount: function() {
+  componentWillMount: function() {
     this.loadCommentsFromServer();
   },
   render: function() {
@@ -48,7 +62,7 @@ var FormBox = React.createClass({
         <h1> Dynamic Form Builder Version 0.1 </h1>
         <AddForm onFormSubmit={this.handleCommentSubmit}/>
         <br></br>
-        <FormList data={this.state.data}/>
+        <FormList resource={this.state.resource} schema={this.state.schema.fields}/>
       </div>
       );
   }
@@ -60,13 +74,12 @@ var FormBox = React.createClass({
 var FormList = React.createClass({
   render: function() {
     // var formNodes;
-    var formNodes = this.props.data.objects.map(function (object) {
+    var formNodes = this.props.resource.objects.map(function (object) {
       return (
-        <GenericForm>
-
+        <GenericForm object={object} schema={this.props.schema}>
         </GenericForm>
         );
-    });
+    }.bind(this));
     return (
       <div className="row FormList">
       {formNodes}
@@ -100,12 +113,60 @@ var GenericForm = React.createClass({
      }
    });
   },
+  componentWillMount: function(){
+    this.props.object = null;
+    this.props.schema = null;
+  },
   handleClick: function() {
     this.deleteRequest();
     this.unmount();
   },
+  renderStringComponent:function(key, val){
+    var final_key = _.startCase(key);
+    return (
+      <div>
+        <strong>{final_key}</strong> : {val}
+      </div>
+      )
+  },
+  renderDateTimeComponent:function(key, val){
+    var date = new Date(val);
+    var final_key = _.startCase(key);
+    return (
+      <div>
+        <strong>{final_key}</strong> : {date.toUTCString()}
+      </div>
+      )
+  },
+  renderRelatedComponent:function(key, val){
+    var final_key = _.startCase(key);
+    return (
+      <div>
+        <strong>{final_key}</strong> : {val}
+      </div>
+      )
+  },
   render: function() {
-    var date = new Date(this.props.created_at);
+    var content = [];
+    if(this.props.schema){
+      // Pentru fiecare prop din object
+      _.forEach(this.props.object, function (val, key){
+        // Extrag type si apelez functia corespunzatoare
+        var fieldType = this.props.schema[key].type;
+        switch(fieldType){
+          case 'string':
+            content.push(this.renderStringComponent(key, val));
+            break;
+          case 'datetime':
+            content.push(this.renderDateTimeComponent(key, val));
+            break;
+          case 'related':
+            content.push(this.renderRelatedComponent(key, val));
+            break;
+        }
+      }.bind(this));
+    }
+
     return (
       <div className="col-md-4">
         <div className="panel panel-default GenericForm">
@@ -116,7 +177,7 @@ var GenericForm = React.createClass({
             </div>
           </div>
           <div className="panel-body">
-          Placeholder
+            {content.map(function (obj) { return obj;})}
           </div>
         </div>
       </div>
