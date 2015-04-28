@@ -159,10 +159,6 @@ var GenericForm = React.createClass({
      }
    });
   },
-  componentWillMount: function(){
-    // this.props.object = null;
-    // this.props.schema = null;
-  },
   handleClick: function() {
     this.deleteRequest();
     this.unmount();
