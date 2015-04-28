@@ -26,3 +26,4 @@ class PostResource(ModelResource):
         queryset = Post.objects.all()
         resource_name = 'post'
         authorization = Authorization()
+        always_return_data = True

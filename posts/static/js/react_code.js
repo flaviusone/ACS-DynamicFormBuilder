@@ -50,7 +50,9 @@ var FormBox = React.createClass({
       contentType: 'application/json',
       data: JSON.stringify(object),
       success: function(data) {
-        this.setState({resource: data});
+        var new_data = this.state.resource;
+        new_data.objects.push(data);
+        this.setState({resource: new_data});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -209,23 +211,27 @@ var GenericForm = React.createClass({
 * Add new GenericForm
 **/
 var AddForm = React.createClass({
+  mixins: [React.addons.LinkedStateMixin],
+  getInitialState: function() {
+    return {title: '',
+            content: ''};
+  },
   handleSubmit: function(e) {
     e.preventDefault();
-    var title = React.findDOMNode(this.refs.title).value.trim();
-    var content = React.findDOMNode(this.refs.content).value.trim();
+    var title = this.state.title;
+    var content = this.state.content;
     if (!content || !title) {
       return;
     }
     this.props.onFormSubmit({author: "/posts/api/v1/author/1/",content: content, title: title});
-    React.findDOMNode(this.refs.title).value = '';
-    React.findDOMNode(this.refs.content).value = '';
+    this.setState({title: '',content: ''})
     return;
   },
   render: function() {
     return (
       <form className="commentForm" onSubmit={this.handleSubmit}>
-        <input type="text" placeholder="Title" ref="title" />
-        <input type="text" placeholder="Content" ref="content" />
+        <input type="text" placeholder="Title" ref="title" valueLink={this.linkState('title')}/>
+        <input type="text" placeholder="Content" ref="content" valueLink={this.linkState('content')}/>
         <input type="submit" value="Add" />
       </form>
       );
