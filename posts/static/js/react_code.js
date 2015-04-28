@@ -7,8 +7,8 @@
 **/
 var FormBox = React.createClass({
   getInitialState: function() {
-    return {resource: {objects: []},
-            schema: {fields: {}}};
+    return {resource: {objects: null},
+            schema: {fields: null}};
   },
   loadCommentsFromServer: function() {
     // Load resource
@@ -38,6 +38,10 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
+  shouldComponentUpdate: function(nextProps, nextState) {
+    // Don't rerender untill objects and schema are available
+    return (nextState.resource.objects && nextState.schema.fields )
+  },
   handleCommentSubmit: function(object) {
     $.ajax({
       url: this.props.url,
@@ -53,16 +57,23 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
-  componentWillMount: function() {
+  componentDidMount: function() {
     this.loadCommentsFromServer();
   },
   render: function() {
+    var data_available = (this.state.resource.objects && this.state.schema.fields);
+    var formlist;
+    if (data_available) {
+      formlist = <FormList resource={this.state.resource} schema={this.state.schema.fields}/>;
+    } else {
+      formlist = <div/>;
+    };
     return (
       <div className="formBox">
         <h1> Dynamic Form Builder Version 0.1 </h1>
         <AddForm onFormSubmit={this.handleCommentSubmit}/>
         <br></br>
-        <FormList resource={this.state.resource} schema={this.state.schema.fields}/>
+        {formlist}
       </div>
       );
   }
@@ -149,8 +160,8 @@ var GenericForm = React.createClass({
    });
   },
   componentWillMount: function(){
-    this.props.object = null;
-    this.props.schema = null;
+    // this.props.object = null;
+    // this.props.schema = null;
   },
   handleClick: function() {
     this.deleteRequest();
@@ -159,6 +170,7 @@ var GenericForm = React.createClass({
   render: function() {
     var content = [];
     var uniquekey = 0; // For Reconciliation
+    // debugger;
     if(this.props.schema){
       // Pentru fiecare prop din object
       _.forEach(this.props.object, function (val, key){
