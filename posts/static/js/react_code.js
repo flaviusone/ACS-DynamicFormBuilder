@@ -74,9 +74,11 @@ var FormBox = React.createClass({
 var FormList = React.createClass({
   render: function() {
     // var formNodes;
+    var uniquekey = -1; // For Reconciliation
     var formNodes = this.props.resource.objects.map(function (object) {
+      uniquekey++;
       return (
-        <GenericForm object={object} schema={this.props.schema}>
+        <GenericForm key={uniquekey} object={object} schema={this.props.schema}>
         </GenericForm>
         );
     }.bind(this));
@@ -156,6 +158,7 @@ var GenericForm = React.createClass({
   },
   render: function() {
     var content = [];
+    var uniquekey = 0; // For Reconciliation
     if(this.props.schema){
       // Pentru fiecare prop din object
       _.forEach(this.props.object, function (val, key){
@@ -163,15 +166,16 @@ var GenericForm = React.createClass({
         var fieldType = this.props.schema[key].type;
         switch(fieldType){
           case 'string':
-            content.push(React.createElement(StringComponent, {val: val, objkey: key}));
+            content.push(React.createElement(StringComponent, {val: val, objkey: key, key: uniquekey}));
             break;
           case 'datetime':
-            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key}));
+            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
             break;
           case 'related':
-            content.push(React.createElement(RelatedComponent, {val: val, objkey: key}));
+            content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
             break;
         }
+        uniquekey++;
       }.bind(this));
     }
 
