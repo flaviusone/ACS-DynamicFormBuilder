@@ -88,6 +88,39 @@ var FormList = React.createClass({
   }
 });
 
+var StringComponent = React.createClass({
+  render: function() {
+    var final_key = _.startCase(this.props.objkey);
+    return (
+      <div className="StringComponent">
+        <strong>{final_key}</strong> : {this.props.val}
+      </div>
+    );
+  }
+});
+
+var DateTimeComponent = React.createClass({
+  render: function() {
+    var date = new Date(this.props.val);
+    var final_key = _.startCase(this.props.objkey);
+    return (
+      <div className="DateTimeComponent">
+        <strong>{final_key}</strong> : {date.toUTCString()}
+      </div>
+    );
+  }
+});
+
+var RelatedComponent = React.createClass({
+  render: function() {
+    var final_key = _.startCase(this.props.objkey);
+    return (
+      <div className="RelatedComponent">
+        <strong>{final_key}</strong> : {this.props.val}
+      </div>
+    );
+  }
+});
 
 /**
 * Generic form object
@@ -121,31 +154,6 @@ var GenericForm = React.createClass({
     this.deleteRequest();
     this.unmount();
   },
-  renderStringComponent:function(key, val){
-    var final_key = _.startCase(key);
-    return (
-      <div>
-        <strong>{final_key}</strong> : {val}
-      </div>
-      )
-  },
-  renderDateTimeComponent:function(key, val){
-    var date = new Date(val);
-    var final_key = _.startCase(key);
-    return (
-      <div>
-        <strong>{final_key}</strong> : {date.toUTCString()}
-      </div>
-      )
-  },
-  renderRelatedComponent:function(key, val){
-    var final_key = _.startCase(key);
-    return (
-      <div>
-        <strong>{final_key}</strong> : {val}
-      </div>
-      )
-  },
   render: function() {
     var content = [];
     if(this.props.schema){
@@ -155,13 +163,13 @@ var GenericForm = React.createClass({
         var fieldType = this.props.schema[key].type;
         switch(fieldType){
           case 'string':
-            content.push(this.renderStringComponent(key, val));
+            content.push(React.createElement(StringComponent, {val: val, objkey: key}));
             break;
           case 'datetime':
-            content.push(this.renderDateTimeComponent(key, val));
+            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key}));
             break;
           case 'related':
-            content.push(this.renderRelatedComponent(key, val));
+            content.push(React.createElement(RelatedComponent, {val: val, objkey: key}));
             break;
         }
       }.bind(this));
@@ -212,9 +220,29 @@ var AddForm = React.createClass({
   }
 });
 
+var EditPanel = React.createClass({
+  render: function() {
+    return (
+      <div className="EditPanel">
+        <div className="panel panel-default EditPanel">
+          <div className="panel-heading">
+          WOlolo
+          </div>
+          <div className="panel-body">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Neque perferendis velit delectus placeat voluptatem, maiores quasi vero tenetur illo laudantium adipisci, harum, quod obcaecati facere omnis modi commodi quae animi.
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
 
 React.render(
   <FormBox url='http://localhost:8000/posts/api/v1/post/'/>,
   document.getElementById('content')
   );
 
+// React.render(
+//   <EditPanel />,
+//   document.getElementById('editPanel')
+//   );
