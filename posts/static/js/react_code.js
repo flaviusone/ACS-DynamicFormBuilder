@@ -149,21 +149,21 @@ var GenericForm = React.createClass({
   },
   deleteRequest: function() {
    $.ajax({
-     url: this.props.url,
+     url: this.props.object.resource_uri,
      type: 'DELETE',
      dataType: 'json',
      data:{},
      success: function (data, textStatus, xhr) {
-
+        console.log(data);
      },
      error: function (xhr, textStatus, errorThrown) {
-       console.log('Error in Delete operation');
+       console.error(xhr, textStatus, errorThrown.toString());
      }
    });
   },
   handleClick: function() {
     this.deleteRequest();
-    this.unmount();
+    // this.unmount();
   },
   render: function() {
     var content = [];
