@@ -42,6 +42,13 @@ var FormBox = React.createClass({
     // Don't rerender untill objects and schema are available
     return (nextState.resource.objects && nextState.schema.fields )
   },
+  unmount_element: function(object){
+    var resource = this.state.resource;
+    var removed = _.remove(resource.objects, function(obj) {
+      return obj.id == object.id;
+    });
+    this.setState(resource);
+  },
   handleCommentSubmit: function(object) {
     $.ajax({
       url: this.props.url,
@@ -66,7 +73,7 @@ var FormBox = React.createClass({
     var data_available = (this.state.resource.objects && this.state.schema.fields);
     var formlist;
     if (data_available) {
-      formlist = <FormList resource={this.state.resource} schema={this.state.schema.fields}/>;
+      formlist = <FormList unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
     } else {
       formlist = <div/>;
     };
@@ -91,7 +98,7 @@ var FormList = React.createClass({
     var formNodes = this.props.resource.objects.map(function (object) {
       uniquekey++;
       return (
-        <GenericForm key={uniquekey} object={object} schema={this.props.schema}>
+        <GenericForm key={uniquekey} object={object} schema={this.props.schema} unmount_element={this.props.unmount_element}>
         </GenericForm>
         );
     }.bind(this));
@@ -141,13 +148,7 @@ var RelatedComponent = React.createClass({
 * Generic form object
 **/
 var GenericForm = React.createClass({
-
-  unmount: function() {
-    var node = this.getDOMNode();
-    React.unmountComponentAtNode(node);
-    $(node).remove();
-  },
-  deleteRequest: function() {
+    deleteRequest: function() {
    $.ajax({
      url: this.props.object.resource_uri,
      type: 'DELETE',
@@ -163,7 +164,7 @@ var GenericForm = React.createClass({
   },
   handleClick: function() {
     this.deleteRequest();
-    // this.unmount();
+    this.props.unmount_element(this.props.object);
   },
   render: function() {
     var content = [];
