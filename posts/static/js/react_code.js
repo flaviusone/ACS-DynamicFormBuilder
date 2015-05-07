@@ -53,10 +53,27 @@ var FormBox = React.createClass({
   unmount_edit: function(){
     this.setState({edit_data: null})
   },
-  handleEdit: function(object){
+  handleEditPress: function(object){
     this.setState({edit_data: object})
   },
   handleCommentSubmit: function(object) {
+    $.ajax({
+      url: this.props.url,
+      type: 'POST',
+      dataType: 'json',
+      contentType: 'application/json',
+      data: JSON.stringify(object),
+      success: function(data) {
+        var new_data = this.state.resource;
+        new_data.objects.push(data);
+        this.setState({resource: new_data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
+  handleCommentEdit: function(object) {
     $.ajax({
       url: this.props.url,
       type: 'POST',
@@ -82,13 +99,13 @@ var FormBox = React.createClass({
     var formlist, editpanel;
 
     if (data_available) {
-      formlist = <FormList handleEdit={this.handleEdit} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
+      formlist = <FormList handleEdit={this.handleEditPress} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
     } else {
       formlist = null;
     };
 
     if(edit_data){
-      editpanel = <EditPanel object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
+      editpanel = <EditPanel handleEditClick={this.handleEditClick} object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
     } else {
       editpanel = null;
     }
@@ -98,10 +115,10 @@ var FormBox = React.createClass({
         <h1> Dynamic Form Builder Version 0.1 </h1>
         <AddForm onFormSubmit={this.handleCommentSubmit}/>
         <br></br>
-        <div className="col-md-8">
+        <div className="col-md-7">
         {formlist}
         </div>
-        <div className="col-md-4">
+        <div className="col-md-5">
         {editpanel}
         </div>
       </div>
@@ -137,6 +154,25 @@ var StringComponent = React.createClass({
     return (
       <div className="StringComponent">
         <strong>{final_key}</strong> : {this.props.val}
+      </div>
+    );
+  }
+});
+
+var EditStringComponent = React.createClass({
+  getInitialState: function() {
+    return {value: this.props.val};
+  },
+  handleChange: function(event) {
+    this.setState({value: event.target.value});
+  },
+  render: function() {
+    var final_key = _.startCase(this.props.objkey);
+    var value = this.state.value;
+    return (
+      <div className="StringComponent">
+        <strong>{final_key}</strong> :
+        <input type="text" value={value} onChange={this.handleChange}/>
       </div>
     );
   }
@@ -232,40 +268,23 @@ var GenericForm = React.createClass({
   }
 });
 
-/**
-* Add new GenericForm
-**/
-var AddForm = React.createClass({
-  mixins: [React.addons.LinkedStateMixin],
-  getInitialState: function() {
-    return {title: '',
-            content: ''};
-  },
-  handleSubmit: function(e) {
-    e.preventDefault();
-    var title = this.state.title;
-    var content = this.state.content;
-    if (!content || !title) {
-      return;
-    }
-    this.props.onFormSubmit({author: "/posts/api/v1/author/1/",content: content, title: title});
-    this.setState({title: '',content: ''})
-    return;
-  },
-  render: function() {
-    return (
-      <form className="commentForm" onSubmit={this.handleSubmit}>
-        <input type="text" placeholder="Title" ref="title" valueLink={this.linkState('title')}/>
-        <input type="text" placeholder="Content" ref="content" valueLink={this.linkState('content')}/>
-        <input type="submit" value="Add" />
-      </form>
-      );
-  }
-});
 
 var EditPanel = React.createClass({
-  handleSubmit: function(){
-
+  // mixins: [React.addons.LinkedStateMixin],
+  // getInitialState: function() {
+  //   return {title: '',
+  //           content: ''};
+  // },
+  handleSubmit: function(e){
+    e.preventDefault();
+    // var title = this.state.title;
+    // var content = this.state.content;
+    // if (!content || !title) {
+    //   return;
+    // }
+    // this.props.handleCommentEdit({author: "/posts/api/v1/author/1/",content: content, title: title});
+    // this.setState({title: '',content: ''})
+    // return;
   },
   handleCancelClick: function(){
     this.props.unmount_edit();
@@ -281,7 +300,7 @@ var EditPanel = React.createClass({
         var fieldType = this.props.schema[key].type;
         switch(fieldType){
           case 'string':
-            content.push(React.createElement(StringComponent, {val: val, objkey: key, key: uniquekey}));
+            content.push(React.createElement(EditStringComponent, {val: val, objkey: key, key: uniquekey}));
             break;
           case 'datetime':
             content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
@@ -314,6 +333,38 @@ var EditPanel = React.createClass({
     );
   }
 });
+
+/**
+* Add new GenericForm
+**/
+var AddForm = React.createClass({
+  mixins: [React.addons.LinkedStateMixin],
+  getInitialState: function() {
+    return {title: '',
+            content: ''};
+  },
+  handleSubmit: function(e) {
+    e.preventDefault();
+    var title = this.state.title;
+    var content = this.state.content;
+    if (!content || !title) {
+      return;
+    }
+    this.props.onFormSubmit({author: "/posts/api/v1/author/1/",content: content, title: title});
+    this.setState({title: '',content: ''})
+    return;
+  },
+  render: function() {
+    return (
+      <form className="commentForm" onSubmit={this.handleSubmit}>
+        <input type="text" pluginsaceholder="Title" ref="title" valueLink={this.linkState('title')}/>
+        <input type="text" placeholder="Content" ref="content" valueLink={this.linkState('content')}/>
+        <input type="submit" value="Add" />
+      </form>
+      );
+  }
+});
+
 
 React.render(
   <FormBox url='http://localhost:8000/posts/api/v1/post/'/>,
