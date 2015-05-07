@@ -8,7 +8,8 @@
 var FormBox = React.createClass({
   getInitialState: function() {
     return {resource: {objects: null},
-            schema: {fields: null}};
+            schema: {fields: null},
+            edit_data: null};
   },
   loadCommentsFromServer: function() {
     // Load resource
@@ -49,6 +50,10 @@ var FormBox = React.createClass({
     });
     this.setState(resource);
   },
+  handleEdit: function(object){
+    console.log(object);
+    this.setState({edit_data: object})
+  },
   handleCommentSubmit: function(object) {
     $.ajax({
       url: this.props.url,
@@ -71,18 +76,32 @@ var FormBox = React.createClass({
   },
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
-    var formlist;
+    var edit_data = this.state.edit_data;
+    var formlist, editpanel;
+
     if (data_available) {
-      formlist = <FormList unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
+      formlist = <FormList handleEdit={this.handleEdit} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
     } else {
-      formlist = <div/>;
+      formlist = null;
     };
+
+    if(edit_data){
+      editpanel = <EditPanel object={this.state.edit_data} schema={this.state.schema.fields}/>
+    } else {
+      editpanel = null;
+    }
+
     return (
       <div className="formBox">
         <h1> Dynamic Form Builder Version 0.1 </h1>
         <AddForm onFormSubmit={this.handleCommentSubmit}/>
         <br></br>
+        <div className="col-md-8">
         {formlist}
+        </div>
+        <div className="col-md-4">
+        {editpanel}
+        </div>
       </div>
       );
   }
@@ -98,7 +117,7 @@ var FormList = React.createClass({
     var formNodes = this.props.resource.objects.map(function (object) {
       uniquekey++;
       return (
-        <GenericForm key={uniquekey} object={object} schema={this.props.schema} unmount_element={this.props.unmount_element}>
+        <GenericForm key={uniquekey} object={object} schema={this.props.schema} unmount_element={this.props.unmount_element} handleEdit={this.props.handleEdit}>
         </GenericForm>
         );
     }.bind(this));
@@ -162,9 +181,12 @@ var GenericForm = React.createClass({
      }
    });
   },
-  handleClick: function() {
+  handleDelClick: function() {
     this.deleteRequest();
     this.props.unmount_element(this.props.object);
+  },
+  handleEditClick: function() {
+    this.props.handleEdit(this.props.object);
   },
   render: function() {
     var content = [];
@@ -195,8 +217,8 @@ var GenericForm = React.createClass({
         <div className="panel panel-default GenericForm">
           <div className="panel-heading">
             <div className="row">
-              <button type="button" className="col-md-6 btn btn-default">Edit</button>
-              <button type="button" onClick={this.handleClick} className="col-md-6 btn btn-default">Delete</button>
+              <button type="button" onClick={this.handleEditClick} className="col-md-6 btn btn-default">Edit</button>
+              <button type="button" onClick={this.handleDelClick} className="col-md-6 btn btn-default">Delete</button>
             </div>
           </div>
           <div className="panel-body">
@@ -241,14 +263,37 @@ var AddForm = React.createClass({
 
 var EditPanel = React.createClass({
   render: function() {
+    var content = [];
+    var uniquekey = 0; // For Reconciliation
+    // debugger;
+    if(this.props.schema){
+      // Pentru fiecare prop din object
+      _.forEach(this.props.object, function (val, key){
+        // Extrag type si apelez functia corespunzatoare
+        var fieldType = this.props.schema[key].type;
+        switch(fieldType){
+          case 'string':
+            content.push(React.createElement(StringComponent, {val: val, objkey: key, key: uniquekey}));
+            break;
+          case 'datetime':
+            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
+            break;
+          case 'related':
+            content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
+            break;
+        }
+        uniquekey++;
+      }.bind(this));
+    }
+
     return (
       <div className="EditPanel">
         <div className="panel panel-default EditPanel">
           <div className="panel-heading">
-          WOlolo
+          Edit Form
           </div>
           <div className="panel-body">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Neque perferendis velit delectus placeat voluptatem, maiores quasi vero tenetur illo laudantium adipisci, harum, quod obcaecati facere omnis modi commodi quae animi.
+            {content.map(function (obj) { return obj;})}
           </div>
         </div>
       </div>
@@ -260,8 +305,3 @@ React.render(
   <FormBox url='http://localhost:8000/posts/api/v1/post/'/>,
   document.getElementById('content')
   );
-
-// React.render(
-//   <EditPanel />,
-//   document.getElementById('editPanel')
-//   );

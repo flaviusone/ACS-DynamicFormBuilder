@@ -1,13 +1,10 @@
-(function() {
-  $.ajax({
-    url: 'http://localhost:8000/posts/api/post/',
-    type: 'GET',
-    contentType: 'application/json',
-    dataType: 'json',
-    success: function(data, textStatus, jqXHR) {
-      // console.log(data);
-    },
-  })
-})();
-
-
+function fixDiv() {
+    var $div = $("#navwrap");
+    if ($(window).scrollTop() > $div.data("top")) {
+        $div.css({'position': 'fixed', 'top': '0', 'width': '100%'});
+    }
+    else {
+        $div.css({'position': 'static', 'top': 'auto', 'width': '100%'});
+    }
+}
+$(window).scroll(fixDiv);
