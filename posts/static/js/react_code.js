@@ -50,8 +50,10 @@ var FormBox = React.createClass({
     });
     this.setState(resource);
   },
+  unmount_edit: function(){
+    this.setState({edit_data: null})
+  },
   handleEdit: function(object){
-    console.log(object);
     this.setState({edit_data: object})
   },
   handleCommentSubmit: function(object) {
@@ -86,7 +88,7 @@ var FormBox = React.createClass({
     };
 
     if(edit_data){
-      editpanel = <EditPanel object={this.state.edit_data} schema={this.state.schema.fields}/>
+      editpanel = <EditPanel object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
     } else {
       editpanel = null;
     }
@@ -262,6 +264,12 @@ var AddForm = React.createClass({
 });
 
 var EditPanel = React.createClass({
+  handleSubmit: function(){
+
+  },
+  handleCancelClick: function(){
+    this.props.unmount_edit();
+  },
   render: function() {
     var content = [];
     var uniquekey = 0; // For Reconciliation
@@ -289,11 +297,17 @@ var EditPanel = React.createClass({
     return (
       <div className="EditPanel">
         <div className="panel panel-default EditPanel">
-          <div className="panel-heading">
+          <div className="panel-heading text-center">
           Edit Form
           </div>
           <div className="panel-body">
-            {content.map(function (obj) { return obj;})}
+              <form className="commentForm" onSubmit={this.handleSubmit}>
+                {content.map(function (obj) { return obj;})}
+                <div className="col-md-1"></div>
+                <input type="submit" className="btn btn-default col-md-4" value="Edit" />
+                <div className="col-md-2"></div>
+                <button type="button" onClick={this.handleCancelClick} className="col-md-4 btn btn-default">Cancel</button>
+              </form>
           </div>
         </div>
       </div>
