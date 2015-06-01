@@ -7,21 +7,23 @@
 <head>
   <title>Licenta</title>
   <link rel="stylesheet" type="text/css" href="{% static "bootstrap/dist/css/bootstrap.css" %}" />
-  <script type="text/javascript" src='{% static 'react/react-with-addons.js' %}'></script>
-  <script type="text/javascript" src='{% static 'react/JSXTransformer.js' %}'></script>
 </head>
 
 <body>
-<div class="container-fluid">
-  <div id="content" class="row">
+  <div class="container-fluid">
+    <div id="content" class="row">
+    </div>
   </div>
-</div>
 
-  <script type="text/jsx" src="{% static "js/react_code.js" %}"></script> <!-- JavaScript -->
+  {# <script type="text/javascript" src='{% static 'react/JSXTransformer.js' %}'></script> #}
+  <script type="text/javascript" src='{% static 'react/react-with-addons.js' %}'></script>
   <script type="text/javascript" src='{% static 'jquery/dist/jquery.js' %}'></script>
   <script type="text/javascript" src='{% static 'lodash/lodash.js' %}'></script>
-  <script src="{% static "js/main.js" %}"></script> <!-- JavaScript -->
 
+  {# // <script type="text/jsx" src="{% static "js/react_code.js" %}"></script> <!-- JavaScript --> #}
+  <script type="text/javascript" src="{% static "js/react_code.js" %}"></script>
+  <script src="{% static "js/main.js" %}"></script> <!-- JavaScript -->
+  <script src="//localhost:35729/livereload.js"></script>
 </body>
 
 </html>
