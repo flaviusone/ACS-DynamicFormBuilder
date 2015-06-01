@@ -1,7 +1,7 @@
 /**
 * Add new GenericForm
 **/
-var AddForm = React.createClass({displayName: "AddForm",
+var AddForm = React.createClass({
   mixins: [React.addons.LinkedStateMixin],
   getInitialState: function() {
     return {title: '',
@@ -20,28 +20,28 @@ var AddForm = React.createClass({displayName: "AddForm",
   },
   render: function() {
     return (
-      React.createElement("form", {className: "commentForm", onSubmit: this.handleSubmit}, 
-        React.createElement("input", {type: "text", pluginsaceholder: "Title", ref: "title", valueLink: this.linkState('title')}), 
-        React.createElement("input", {type: "text", placeholder: "Content", ref: "content", valueLink: this.linkState('content')}), 
-        React.createElement("input", {type: "submit", value: "Add"})
-      )
+      <form className="commentForm" onSubmit={this.handleSubmit}>
+        <input type="text" pluginsaceholder="Title" ref="title" valueLink={this.linkState('title')}/>
+        <input type="text" placeholder="Content" ref="content" valueLink={this.linkState('content')}/>
+        <input type="submit" value="Add" />
+      </form>
       );
   }
 });
 
 
-var StringComponent = React.createClass({displayName: "StringComponent",
+var StringComponent = React.createClass({
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     return (
-      React.createElement("div", {className: "StringComponent"}, 
-        React.createElement("strong", null, final_key), " : ", this.props.val
-      )
+      <div className="StringComponent">
+        <strong>{final_key}</strong> : {this.props.val}
+      </div>
     );
   }
 });
 
-var EditStringComponent = React.createClass({displayName: "EditStringComponent",
+var EditStringComponent = React.createClass({
   getInitialState: function() {
     return {value: this.props.val};
   },
@@ -52,38 +52,38 @@ var EditStringComponent = React.createClass({displayName: "EditStringComponent",
     var final_key = _.startCase(this.props.objkey);
     var value = this.state.value;
     return (
-      React.createElement("div", {className: "StringComponent"}, 
-        React.createElement("strong", null, final_key), " :", 
-        React.createElement("input", {type: "text", value: value, onChange: this.handleChange})
-      )
+      <div className="StringComponent">
+        <strong>{final_key}</strong> :
+        <input type="text" value={value} onChange={this.handleChange}/>
+      </div>
     );
   }
 });
 
-var DateTimeComponent = React.createClass({displayName: "DateTimeComponent",
+var DateTimeComponent = React.createClass({
   render: function() {
     var date = new Date(this.props.val);
     var final_key = _.startCase(this.props.objkey);
     return (
-      React.createElement("div", {className: "DateTimeComponent"}, 
-        React.createElement("strong", null, final_key), " : ", date.toUTCString()
-      )
+      <div className="DateTimeComponent">
+        <strong>{final_key}</strong> : {date.toUTCString()}
+      </div>
     );
   }
 });
 
-var RelatedComponent = React.createClass({displayName: "RelatedComponent",
+var RelatedComponent = React.createClass({
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     return (
-      React.createElement("div", {className: "RelatedComponent"}, 
-        React.createElement("strong", null, final_key), " : ", this.props.val
-      )
+      <div className="RelatedComponent">
+        <strong>{final_key}</strong> : {this.props.val}
+      </div>
     );
   }
 });
 
-var EditPanel = React.createClass({displayName: "EditPanel",
+var EditPanel = React.createClass({
   // mixins: [React.addons.LinkedStateMixin],
   // getInitialState: function() {
   //   return {title: '',
@@ -128,22 +128,22 @@ var EditPanel = React.createClass({displayName: "EditPanel",
     }
 
     return (
-      React.createElement("div", {className: "EditPanel"}, 
-        React.createElement("div", {className: "panel panel-default EditPanel"}, 
-          React.createElement("div", {className: "panel-heading text-center"}, 
-          "Edit Form"
-          ), 
-          React.createElement("div", {className: "panel-body"}, 
-              React.createElement("form", {className: "commentForm", onSubmit: this.handleSubmit}, 
-                content.map(function (obj) { return obj;}), 
-                React.createElement("div", {className: "col-md-1"}), 
-                React.createElement("input", {type: "submit", className: "btn btn-default col-md-4", value: "Edit"}), 
-                React.createElement("div", {className: "col-md-2"}), 
-                React.createElement("button", {type: "button", onClick: this.handleCancelClick, className: "col-md-4 btn btn-default"}, "Cancel")
-              )
-          )
-        )
-      )
+      <div className="EditPanel">
+        <div className="panel panel-default EditPanel">
+          <div className="panel-heading text-center">
+          Edit Form
+          </div>
+          <div className="panel-body">
+              <form className="commentForm" onSubmit={this.handleSubmit}>
+                {content.map(function (obj) { return obj;})}
+                <div className="col-md-1"></div>
+                <input type="submit" className="btn btn-default col-md-4" value="Edit" />
+                <div className="col-md-2"></div>
+                <button type="button" onClick={this.handleCancelClick} className="col-md-4 btn btn-default">Cancel</button>
+              </form>
+          </div>
+        </div>
+      </div>
     );
   }
 });
@@ -151,7 +151,7 @@ var EditPanel = React.createClass({displayName: "EditPanel",
 /**
 * Main container
 **/
-var FormBox = React.createClass({displayName: "FormBox",
+var FormBox = React.createClass({
   getInitialState: function() {
     return {resource: {objects: null},
             schema: {fields: null},
@@ -245,56 +245,56 @@ var FormBox = React.createClass({displayName: "FormBox",
     var formlist, editpanel;
 
     if (data_available) {
-      formlist = React.createElement(FormList, {handleEdit: this.handleEditPress, unmount_element: this.unmount_element, resource: this.state.resource, schema: this.state.schema.fields});
+      formlist = <FormList handleEdit={this.handleEditPress} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
     } else {
       formlist = null;
     };
 
     if(edit_data){
-      editpanel = React.createElement(EditPanel, {handleEditClick: this.handleEditClick, object: this.state.edit_data, schema: this.state.schema.fields, unmount_edit: this.unmount_edit})
+      editpanel = <EditPanel handleEditClick={this.handleEditClick} object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
     } else {
       editpanel = null;
     }
 
     return (
-      React.createElement("div", {className: "formBox"}, 
-        React.createElement("h1", null, " Dynamic Form Builder Version 0.1 "), 
-        React.createElement(AddForm, {onFormSubmit: this.handleCommentSubmit}), 
-        React.createElement("br", null), 
-        React.createElement("div", {className: "col-md-7"}, 
-        formlist
-        ), 
-        React.createElement("div", {className: "col-md-5"}, 
-        editpanel
-        )
-      )
+      <div className="formBox">
+        <h1> Dynamic Form Builder Version 0.1 </h1>
+        <AddForm onFormSubmit={this.handleCommentSubmit}/>
+        <br></br>
+        <div className="col-md-7">
+        {formlist}
+        </div>
+        <div className="col-md-5">
+        {editpanel}
+        </div>
+      </div>
       );
   }
 });
 
 React.render(
-  React.createElement(FormBox, {url: "http://localhost:8000/posts/api/v1/post/"}),
+  <FormBox url='http://localhost:8000/posts/api/v1/post/'/>,
   document.getElementById('content')
   );
 
 /**
 * List Container for GenericForm objects
 **/
-var FormList = React.createClass({displayName: "FormList",
+var FormList = React.createClass({
   render: function() {
     // var formNodes;
     var uniquekey = -1; // For Reconciliation
     var formNodes = this.props.resource.objects.map(function (object) {
       uniquekey++;
       return (
-        React.createElement(GenericForm, {key: uniquekey, object: object, schema: this.props.schema, unmount_element: this.props.unmount_element, handleEdit: this.props.handleEdit}
-        )
+        <GenericForm key={uniquekey} object={object} schema={this.props.schema} unmount_element={this.props.unmount_element} handleEdit={this.props.handleEdit}>
+        </GenericForm>
         );
     }.bind(this));
     return (
-      React.createElement("div", {className: "row FormList"}, 
-      formNodes
-      )
+      <div className="row FormList">
+      {formNodes}
+      </div>
       );
   }
 });
@@ -302,7 +302,7 @@ var FormList = React.createClass({displayName: "FormList",
 /**
 * Generic form object
 **/
-var GenericForm = React.createClass({displayName: "GenericForm",
+var GenericForm = React.createClass({
     deleteRequest: function() {
    $.ajax({
      url: this.props.object.resource_uri,
@@ -349,19 +349,19 @@ var GenericForm = React.createClass({displayName: "GenericForm",
     }
 
     return (
-      React.createElement("div", {className: "col-md-4"}, 
-        React.createElement("div", {className: "panel panel-default GenericForm"}, 
-          React.createElement("div", {className: "panel-heading"}, 
-            React.createElement("div", {className: "row"}, 
-              React.createElement("button", {type: "button", onClick: this.handleEditClick, className: "col-md-6 btn btn-default"}, "Edit"), 
-              React.createElement("button", {type: "button", onClick: this.handleDelClick, className: "col-md-6 btn btn-default"}, "Delete")
-            )
-          ), 
-          React.createElement("div", {className: "panel-body"}, 
-            content.map(function (obj) { return obj;})
-          )
-        )
-      )
+      <div className="col-md-4">
+        <div className="panel panel-default GenericForm">
+          <div className="panel-heading">
+            <div className="row">
+              <button type="button" onClick={this.handleEditClick} className="col-md-6 btn btn-default">Edit</button>
+              <button type="button" onClick={this.handleDelClick} className="col-md-6 btn btn-default">Delete</button>
+            </div>
+          </div>
+          <div className="panel-body">
+            {content.map(function (obj) { return obj;})}
+          </div>
+        </div>
+      </div>
       );
   }
 });
