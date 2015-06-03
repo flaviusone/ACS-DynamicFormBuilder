@@ -20,10 +20,11 @@ var EditStringComponent = React.createClass({
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     var value = this.state.value;
+    // console.log(this.props.key);
     return (
       <div className="StringComponent">
         <strong>{final_key}</strong> :
-        <input type="text" value={value} onChange={this.handleChange}/>
+        <input id={this.props.obj_id} type="text" value={value} onChange={this.handleChange}/>
       </div>
     );
   }

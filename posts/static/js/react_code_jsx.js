@@ -51,10 +51,11 @@ var EditStringComponent = React.createClass({
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     var value = this.state.value;
+    // console.log(this.props.key);
     return (
       <div className="StringComponent">
         <strong>{final_key}</strong> :
-        <input type="text" value={value} onChange={this.handleChange}/>
+        <input id={this.props.obj_id} type="text" value={value} onChange={this.handleChange}/>
       </div>
     );
   }
@@ -84,21 +85,34 @@ var RelatedComponent = React.createClass({
 });
 
 var EditPanel = React.createClass({
-  // mixins: [React.addons.LinkedStateMixin],
-  // getInitialState: function() {
-  //   return {title: '',
-  //           content: ''};
-  // },
   handleSubmit: function(e){
-    e.preventDefault();
-    // var title = this.state.title;
-    // var content = this.state.content;
-    // if (!content || !title) {
-    //   return;
-    // }
-    // this.props.handleCommentEdit({author: "/posts/api/v1/author/1/",content: content, title: title});
-    // this.setState({title: '',content: ''})
-    // return;
+    var uniquekey = 0;
+    var requestObj = {};
+    if(this.props.schema){
+      // Pentru fiecare prop din object
+      _.forEach(this.props.object, function (val, key){
+         var obj_id = uniquekey+this.props.method;
+         // Citesc din campurile modificabile
+         var inputVal = document.getElementById(obj_id);
+         if(inputVal){
+           // Adauga la obiect key:inputVal.value
+           requestObj[key] = inputVal.value;
+         }else{
+           // Adauga la obiect key:value
+           requestObj[key] = val;
+         }
+        uniquekey++;
+      }.bind(this));
+      // console.log(requestObj);
+    }
+  // Ajax request
+  this.props.handleSubmit(requestObj, this.props.method);
+
+  if(this.props.method=="edit"){
+    this.props.unmount_edit();
+  }
+
+  return;
   },
   handleCancelClick: function(){
     this.props.unmount_edit();
@@ -112,9 +126,11 @@ var EditPanel = React.createClass({
       _.forEach(this.props.object, function (val, key){
         // Extrag type si apelez functia corespunzatoare
         var fieldType = this.props.schema[key].type;
+        // Un id unic ca sa il pot gasi cu getElementById
+        var obj_id = uniquekey+this.props.method;
         switch(fieldType){
           case 'string':
-            content.push(React.createElement(EditStringComponent, {val: val, objkey: key, key: uniquekey}));
+            content.push(React.createElement(EditStringComponent, {val: val, objkey: key, key: uniquekey, obj_id: obj_id}));
             break;
           case 'datetime':
             content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
@@ -137,7 +153,7 @@ var EditPanel = React.createClass({
               <form className="commentForm" onSubmit={this.handleSubmit}>
                 {content.map(function (obj) { return obj;})}
                 <div className="col-md-1"></div>
-                <input type="submit" className="btn btn-default col-md-4" value="Edit" />
+                <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Edit</button>
                 <div className="col-md-2"></div>
                 <button type="button" onClick={this.handleCancelClick} className="col-md-4 btn btn-default">Cancel</button>
               </form>
@@ -219,16 +235,18 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
-  handleCommentEdit: function(object) {
+  handleCommentEdit: function(object, method) {
     $.ajax({
-      url: this.props.url,
-      type: 'POST',
+      url: object.resource_uri,
+      type: 'PATCH',
       dataType: 'json',
       contentType: 'application/json',
       data: JSON.stringify(object),
       success: function(data) {
         var new_data = this.state.resource;
-        new_data.objects.push(data);
+        // Caut indexul vechului element care a fost updatat ca sa il suprascriu
+        var index = _.findIndex(this.state.resource.objects, _.matchesProperty('resource_uri', data.resource_uri));
+        new_data.objects[index] = data;
         this.setState({resource: new_data});
       }.bind(this),
       error: function(xhr, status, err) {
@@ -251,7 +269,7 @@ var FormBox = React.createClass({
     };
 
     if(edit_data){
-      editpanel = <EditPanel handleEditClick={this.handleEditClick} object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
+      editpanel = <EditPanel method="edit" handleSubmit={this.handleCommentEdit} object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
     } else {
       editpanel = null;
     }

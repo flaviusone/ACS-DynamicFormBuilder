@@ -69,16 +69,18 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
-  handleCommentEdit: function(object) {
+  handleCommentEdit: function(object, method) {
     $.ajax({
-      url: this.props.url,
-      type: 'POST',
+      url: object.resource_uri,
+      type: 'PATCH',
       dataType: 'json',
       contentType: 'application/json',
       data: JSON.stringify(object),
       success: function(data) {
         var new_data = this.state.resource;
-        new_data.objects.push(data);
+        // Caut indexul vechului element care a fost updatat ca sa il suprascriu
+        var index = _.findIndex(this.state.resource.objects, _.matchesProperty('resource_uri', data.resource_uri));
+        new_data.objects[index] = data;
         this.setState({resource: new_data});
       }.bind(this),
       error: function(xhr, status, err) {
@@ -101,7 +103,7 @@ var FormBox = React.createClass({
     };
 
     if(edit_data){
-      editpanel = <EditPanel handleEditClick={this.handleEditClick} object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
+      editpanel = <EditPanel method="edit" handleSubmit={this.handleCommentEdit} object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
     } else {
       editpanel = null;
     }

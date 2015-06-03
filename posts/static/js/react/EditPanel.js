@@ -1,20 +1,33 @@
 
 var EditPanel = React.createClass({
-  // mixins: [React.addons.LinkedStateMixin],
-  // getInitialState: function() {
-  //   return {title: '',
-  //           content: ''};
-  // },
   handleSubmit: function(e){
-    e.preventDefault();
-    // var title = this.state.title;
-    // var content = this.state.content;
-    // if (!content || !title) {
-    //   return;
-    // }
-    // this.props.handleCommentEdit({author: "/posts/api/v1/author/1/",content: content, title: title});
-    // this.setState({title: '',content: ''})
-    // return;
+    var uniquekey = 0;
+    var requestObj = {};
+    if(this.props.schema){
+      // Pentru fiecare prop din object
+      _.forEach(this.props.object, function (val, key){
+         var obj_id = uniquekey+this.props.method;
+         // Citesc din campurile modificabile
+         var inputVal = document.getElementById(obj_id);
+         if(inputVal){
+           // Adauga la obiect key:inputVal.value
+           requestObj[key] = inputVal.value;
+         }else{
+           // Adauga la obiect key:value
+           requestObj[key] = val;
+         }
+        uniquekey++;
+      }.bind(this));
+      // console.log(requestObj);
+    }
+  // Ajax request
+  this.props.handleSubmit(requestObj, this.props.method);
+
+  if(this.props.method=="edit"){
+    this.props.unmount_edit();
+  }
+
+  return;
   },
   handleCancelClick: function(){
     this.props.unmount_edit();
@@ -28,9 +41,11 @@ var EditPanel = React.createClass({
       _.forEach(this.props.object, function (val, key){
         // Extrag type si apelez functia corespunzatoare
         var fieldType = this.props.schema[key].type;
+        // Un id unic ca sa il pot gasi cu getElementById
+        var obj_id = uniquekey+this.props.method;
         switch(fieldType){
           case 'string':
-            content.push(React.createElement(EditStringComponent, {val: val, objkey: key, key: uniquekey}));
+            content.push(React.createElement(EditStringComponent, {val: val, objkey: key, key: uniquekey, obj_id: obj_id}));
             break;
           case 'datetime':
             content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
@@ -53,7 +68,7 @@ var EditPanel = React.createClass({
               <form className="commentForm" onSubmit={this.handleSubmit}>
                 {content.map(function (obj) { return obj;})}
                 <div className="col-md-1"></div>
-                <input type="submit" className="btn btn-default col-md-4" value="Edit" />
+                <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Edit</button>
                 <div className="col-md-2"></div>
                 <button type="button" onClick={this.handleCancelClick} className="col-md-4 btn btn-default">Cancel</button>
               </form>
