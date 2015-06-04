@@ -103,12 +103,11 @@ var EditPanel = React.createClass({displayName: "EditPanel",
          }
         uniquekey++;
       }.bind(this));
-      // console.log(requestObj);
     }
   // Ajax request
   this.props.handleSubmit(requestObj, this.props.method);
 
-  if(this.props.method=="edit"){
+  if(this.props.method=="Edit"){
     this.props.unmount_edit();
   }
 
@@ -143,19 +142,27 @@ var EditPanel = React.createClass({displayName: "EditPanel",
       }.bind(this));
     }
 
+    // Display only on the edit form
+    var cancelbutton;
+    if(this.props.method == "Edit"){
+      cancelbutton = React.createElement("button", {type: "button", onClick: this.handleCancelClick, className: "col-md-4 btn btn-default"}, "Cancel")
+    } else {
+      cancelbutton = "";
+    }
+
     return (
       React.createElement("div", {className: "EditPanel"}, 
         React.createElement("div", {className: "panel panel-default EditPanel"}, 
           React.createElement("div", {className: "panel-heading text-center"}, 
-          "Edit Form"
+          this.props.method, " Form"
           ), 
           React.createElement("div", {className: "panel-body"}, 
               React.createElement("form", {className: "commentForm", onSubmit: this.handleSubmit}, 
                 content.map(function (obj) { return obj;}), 
                 React.createElement("div", {className: "col-md-1"}), 
-                React.createElement("button", {type: "button", onClick: this.handleSubmit, className: "col-md-4 btn btn-default"}, "Edit"), 
+                React.createElement("button", {type: "button", onClick: this.handleSubmit, className: "col-md-4 btn btn-default"}, "Submit"), 
                 React.createElement("div", {className: "col-md-2"}), 
-                React.createElement("button", {type: "button", onClick: this.handleCancelClick, className: "col-md-4 btn btn-default"}, "Cancel")
+                cancelbutton
               )
           )
         )
@@ -257,6 +264,20 @@ var FormBox = React.createClass({displayName: "FormBox",
   componentDidMount: function() {
     this.loadCommentsFromServer();
   },
+  getEmptyObject: function() {
+    // Gets an empty object corresponding to the schema
+    // Used on the Add form
+    var object = {};
+    var data_available = this.state.schema.fields;
+    if(data_available){
+      _.forEach(this.state.schema.fields, function (val, key){
+        object[key] = null;
+      });
+    }
+    object.author = logged_user;
+    object.resource_uri = this.props.url;
+    return object;
+  },
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
     var edit_data = this.state.edit_data;
@@ -269,16 +290,19 @@ var FormBox = React.createClass({displayName: "FormBox",
     };
 
     if(edit_data){
-      editpanel = React.createElement(EditPanel, {method: "edit", handleSubmit: this.handleCommentEdit, object: this.state.edit_data, schema: this.state.schema.fields, unmount_edit: this.unmount_edit})
+      editpanel = React.createElement(EditPanel, {method: "Edit", handleSubmit: this.handleCommentEdit, object: this.state.edit_data, schema: this.state.schema.fields, unmount_edit: this.unmount_edit})
     } else {
       editpanel = null;
     }
-
     return (
       React.createElement("div", {className: "formBox"}, 
-        React.createElement("h1", null, " Dynamic Form Builder Version 0.1 "), 
-        React.createElement(AddForm, {onFormSubmit: this.handleCommentSubmit}), 
-        React.createElement("br", null), 
+      React.createElement("h1", null, " Dynamic Form Builder Version 0.1 "), 
+      React.createElement("div", {className: "row"}, 
+        React.createElement("div", {className: "col-md-4"}, 
+          React.createElement(EditPanel, {method: "Add", handleSubmit: this.handleCommentSubmit, object: this.getEmptyObject(), schema: this.state.schema.fields, unmount_edit: this.unmount_edit}), 
+          React.createElement("br", null)
+        )
+      ), 
         React.createElement("div", {className: "col-md-7"}, 
         formlist
         ), 
@@ -291,10 +315,10 @@ var FormBox = React.createClass({displayName: "FormBox",
 });
 
 React.render(
-  React.createElement(FormBox, {url: "http://localhost:8000/posts/api/v1/post/"}),
+  React.createElement(FormBox, {url: "/posts/api/v1/post/"}),
   document.getElementById('content')
   );
-
+var logged_user = "/posts/api/v1/author/1/";
 /**
 * List Container for GenericForm objects
 **/

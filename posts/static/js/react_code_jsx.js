@@ -103,12 +103,11 @@ var EditPanel = React.createClass({
          }
         uniquekey++;
       }.bind(this));
-      // console.log(requestObj);
     }
   // Ajax request
   this.props.handleSubmit(requestObj, this.props.method);
 
-  if(this.props.method=="edit"){
+  if(this.props.method=="Edit"){
     this.props.unmount_edit();
   }
 
@@ -143,19 +142,27 @@ var EditPanel = React.createClass({
       }.bind(this));
     }
 
+    // Display only on the edit form
+    var cancelbutton;
+    if(this.props.method == "Edit"){
+      cancelbutton = <button type="button" onClick={this.handleCancelClick} className="col-md-4 btn btn-default">Cancel</button>
+    } else {
+      cancelbutton = "";
+    }
+
     return (
       <div className="EditPanel">
         <div className="panel panel-default EditPanel">
           <div className="panel-heading text-center">
-          Edit Form
+          {this.props.method} Form
           </div>
           <div className="panel-body">
               <form className="commentForm" onSubmit={this.handleSubmit}>
                 {content.map(function (obj) { return obj;})}
                 <div className="col-md-1"></div>
-                <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Edit</button>
+                <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Submit</button>
                 <div className="col-md-2"></div>
-                <button type="button" onClick={this.handleCancelClick} className="col-md-4 btn btn-default">Cancel</button>
+                {cancelbutton}
               </form>
           </div>
         </div>
@@ -257,6 +264,20 @@ var FormBox = React.createClass({
   componentDidMount: function() {
     this.loadCommentsFromServer();
   },
+  getEmptyObject: function() {
+    // Gets an empty object corresponding to the schema
+    // Used on the Add form
+    var object = {};
+    var data_available = this.state.schema.fields;
+    if(data_available){
+      _.forEach(this.state.schema.fields, function (val, key){
+        object[key] = null;
+      });
+    }
+    object.author = logged_user;
+    object.resource_uri = this.props.url;
+    return object;
+  },
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
     var edit_data = this.state.edit_data;
@@ -269,16 +290,19 @@ var FormBox = React.createClass({
     };
 
     if(edit_data){
-      editpanel = <EditPanel method="edit" handleSubmit={this.handleCommentEdit} object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
+      editpanel = <EditPanel method="Edit" handleSubmit={this.handleCommentEdit} object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
     } else {
       editpanel = null;
     }
-
     return (
       <div className="formBox">
-        <h1> Dynamic Form Builder Version 0.1 </h1>
-        <AddForm onFormSubmit={this.handleCommentSubmit}/>
-        <br></br>
+      <h1> Dynamic Form Builder Version 0.1 </h1>
+      <div className="row">
+        <div className="col-md-4">
+          <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
+          <br></br>
+        </div>
+      </div>
         <div className="col-md-7">
         {formlist}
         </div>
@@ -291,10 +315,10 @@ var FormBox = React.createClass({
 });
 
 React.render(
-  <FormBox url='http://localhost:8000/posts/api/v1/post/'/>,
+  <FormBox url='/posts/api/v1/post/'/>,
   document.getElementById('content')
   );
-
+var logged_user = "/posts/api/v1/author/1/";
 /**
 * List Container for GenericForm objects
 **/

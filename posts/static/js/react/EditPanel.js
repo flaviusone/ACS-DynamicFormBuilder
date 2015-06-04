@@ -18,12 +18,11 @@ var EditPanel = React.createClass({
          }
         uniquekey++;
       }.bind(this));
-      // console.log(requestObj);
     }
   // Ajax request
   this.props.handleSubmit(requestObj, this.props.method);
 
-  if(this.props.method=="edit"){
+  if(this.props.method=="Edit"){
     this.props.unmount_edit();
   }
 
@@ -58,19 +57,27 @@ var EditPanel = React.createClass({
       }.bind(this));
     }
 
+    // Display only on the edit form
+    var cancelbutton;
+    if(this.props.method == "Edit"){
+      cancelbutton = <button type="button" onClick={this.handleCancelClick} className="col-md-4 btn btn-default">Cancel</button>
+    } else {
+      cancelbutton = "";
+    }
+
     return (
       <div className="EditPanel">
         <div className="panel panel-default EditPanel">
           <div className="panel-heading text-center">
-          Edit Form
+          {this.props.method} Form
           </div>
           <div className="panel-body">
               <form className="commentForm" onSubmit={this.handleSubmit}>
                 {content.map(function (obj) { return obj;})}
                 <div className="col-md-1"></div>
-                <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Edit</button>
+                <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Submit</button>
                 <div className="col-md-2"></div>
-                <button type="button" onClick={this.handleCancelClick} className="col-md-4 btn btn-default">Cancel</button>
+                {cancelbutton}
               </form>
           </div>
         </div>
