@@ -37,7 +37,7 @@ var GenericForm = React.createClass({
             content.push(React.createElement(StringComponent, {val: val, objkey: key, key: uniquekey}));
             break;
           case 'datetime':
-            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
+            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey, method: null}));
             break;
           case 'related':
             content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));

@@ -56,7 +56,7 @@ var EditStringComponent = React.createClass({
     if(readonly){
       field = {value}
     } else {
-      field = <input id={this.props.obj_id} type="text" value={value} onChange={this.handleChange}/>;
+      field = <input id={this.props.obj_id} className="form-control" type="text" value={value} onChange={this.handleChange}/>;
     }
     return (
       <div className="StringComponent">
@@ -68,12 +68,29 @@ var EditStringComponent = React.createClass({
 });
 
 var DateTimeComponent = React.createClass({
+  componentDidMount: function() {
+    if(this.props.method!=null){
+      var id = '#'+this.props.obj_id;
+      // Initializez campul cu data ce vreau sa o modific.
+      var init_data = {}
+      if(this.props.val){
+          init_data.defaultDate =  new Date(this.props.val)
+        }
+      $(function () { $(id).datetimepicker(init_data); });
+    }
+  },
   render: function() {
     var date = new Date(this.props.val);
     var final_key = _.startCase(this.props.objkey);
+    var field;
+    if(this.props.method){
+      field = <input type='text' className="form-control" id={this.props.obj_id} />
+    } else {
+      field = date.toUTCString();
+    }
     return (
       <div className="DateTimeComponent">
-        <strong>{final_key}</strong> : {date.toUTCString()}
+        <strong>{final_key}</strong>: {field}
       </div>
     );
   }
@@ -151,7 +168,7 @@ var EditPanel = React.createClass({
               content.push(React.createElement(EditStringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
               break;
             case 'datetime':
-              content.push(React.createElement(DateTimeComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
+              content.push(React.createElement(DateTimeComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id, method: this.props.method}));
               break;
             case 'related':
               content.push(React.createElement(RelatedComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
@@ -403,7 +420,7 @@ var GenericForm = React.createClass({
             content.push(React.createElement(StringComponent, {val: val, objkey: key, key: uniquekey}));
             break;
           case 'datetime':
-            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
+            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey, method: null}));
             break;
           case 'related':
             content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
