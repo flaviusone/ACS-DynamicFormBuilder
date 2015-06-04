@@ -48,6 +48,9 @@ var EditStringComponent = React.createClass({displayName: "EditStringComponent",
   handleChange: function(event) {
     this.setState({value: event.target.value});
   },
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({value: nextProps.val});
+  },
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     var value = this.state.value;
@@ -77,6 +80,17 @@ var DateTimeComponent = React.createClass({displayName: "DateTimeComponent",
           init_data.defaultDate =  new Date(this.props.val)
         }
       $(function () { $(id).datetimepicker(init_data); });
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
+    if(this.props.method!=null){
+      var id = '#'+this.props.obj_id;
+      // Initializez campul cu data ce vreau sa o modific.
+      var init_data = {}
+      if(nextProps.val){
+          init_data.defaultDate =  new Date(nextProps.val)
+        }
+      $(function () { $(id).data("DateTimePicker").date(new Date(nextProps.val)); });
     }
   },
   render: function() {
@@ -154,7 +168,6 @@ var EditPanel = React.createClass({displayName: "EditPanel",
     var content = [];
     var uniquekey = 0; // For Reconciliation
     var object = this.props.object;
-
     if(this.props.schema){
       // Pentru fiecare prop din object
       _.forEach(object, function (val, key){
@@ -336,18 +349,20 @@ var FormBox = React.createClass({displayName: "FormBox",
     }
     return (
       React.createElement("div", {className: "formBox"}, 
-      React.createElement("h1", null, " Dynamic Form Builder Version 0.1 "), 
-      React.createElement("div", {className: "row"}, 
-        React.createElement("div", {className: "col-md-4"}, 
-          React.createElement(EditPanel, {method: "Add", handleSubmit: this.handleCommentSubmit, object: this.getEmptyObject(), schema: this.state.schema.fields, unmount_edit: this.unmount_edit}), 
-          React.createElement("br", null)
-        )
-      ), 
-        React.createElement("div", {className: "col-md-7"}, 
-        formlist
+        React.createElement("div", {className: "col-md-4"}), 
+        React.createElement("h1", {className: "col-md-8"}, " Dynamic Form Builder Version 0.1 "), 
+        React.createElement("div", {className: "row"}, 
+          React.createElement("div", {className: "col-md-2"}), 
+          React.createElement("div", {className: "col-md-4"}, 
+            React.createElement(EditPanel, {method: "Add", handleSubmit: this.handleCommentSubmit, object: this.getEmptyObject(), schema: this.state.schema.fields, unmount_edit: this.unmount_edit}), 
+            React.createElement("br", null)
+          ), 
+          React.createElement("div", {className: "col-md-4"}, 
+            editpanel
+          )
         ), 
-        React.createElement("div", {className: "col-md-5"}, 
-        editpanel
+        React.createElement("div", {className: "col-md-12"}, 
+          formlist
         )
       )
       );
@@ -434,7 +449,7 @@ var GenericForm = React.createClass({displayName: "GenericForm",
     }
 
     return (
-      React.createElement("div", {className: "col-md-4"}, 
+      React.createElement("div", {className: "col-md-3"}, 
         React.createElement("div", {className: "panel panel-default GenericForm"}, 
           React.createElement("div", {className: "panel-heading"}, 
             React.createElement("div", {className: "row"}, 

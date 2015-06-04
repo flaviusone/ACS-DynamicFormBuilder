@@ -35,7 +35,6 @@ var EditPanel = React.createClass({
     var content = [];
     var uniquekey = 0; // For Reconciliation
     var object = this.props.object;
-
     if(this.props.schema){
       // Pentru fiecare prop din object
       _.forEach(object, function (val, key){

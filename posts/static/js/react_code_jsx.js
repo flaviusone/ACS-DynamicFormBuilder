@@ -48,6 +48,9 @@ var EditStringComponent = React.createClass({
   handleChange: function(event) {
     this.setState({value: event.target.value});
   },
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({value: nextProps.val});
+  },
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     var value = this.state.value;
@@ -77,6 +80,17 @@ var DateTimeComponent = React.createClass({
           init_data.defaultDate =  new Date(this.props.val)
         }
       $(function () { $(id).datetimepicker(init_data); });
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
+    if(this.props.method!=null){
+      var id = '#'+this.props.obj_id;
+      // Initializez campul cu data ce vreau sa o modific.
+      var init_data = {}
+      if(nextProps.val){
+          init_data.defaultDate =  new Date(nextProps.val)
+        }
+      $(function () { $(id).data("DateTimePicker").date(new Date(nextProps.val)); });
     }
   },
   render: function() {
@@ -154,7 +168,6 @@ var EditPanel = React.createClass({
     var content = [];
     var uniquekey = 0; // For Reconciliation
     var object = this.props.object;
-
     if(this.props.schema){
       // Pentru fiecare prop din object
       _.forEach(object, function (val, key){
@@ -336,18 +349,20 @@ var FormBox = React.createClass({
     }
     return (
       <div className="formBox">
-      <h1> Dynamic Form Builder Version 0.1 </h1>
-      <div className="row">
-        <div className="col-md-4">
-          <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
-          <br></br>
+        <div className="col-md-4"></div>
+        <h1 className="col-md-8"> Dynamic Form Builder Version 0.1 </h1>
+        <div className="row">
+          <div className="col-md-2"></div>
+          <div className="col-md-4">
+            <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
+            <br></br>
+          </div>
+          <div className="col-md-4">
+            {editpanel}
+          </div>
         </div>
-      </div>
-        <div className="col-md-7">
-        {formlist}
-        </div>
-        <div className="col-md-5">
-        {editpanel}
+        <div className="col-md-12">
+          {formlist}
         </div>
       </div>
       );
@@ -434,7 +449,7 @@ var GenericForm = React.createClass({
     }
 
     return (
-      <div className="col-md-4">
+      <div className="col-md-3">
         <div className="panel panel-default GenericForm">
           <div className="panel-heading">
             <div className="row">

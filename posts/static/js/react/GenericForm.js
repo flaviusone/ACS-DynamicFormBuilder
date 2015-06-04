@@ -51,7 +51,7 @@ var GenericForm = React.createClass({
     }
 
     return (
-      <div className="col-md-4">
+      <div className="col-md-3">
         <div className="panel panel-default GenericForm">
           <div className="panel-heading">
             <div className="row">

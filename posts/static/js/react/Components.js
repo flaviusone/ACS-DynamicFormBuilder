@@ -17,6 +17,9 @@ var EditStringComponent = React.createClass({
   handleChange: function(event) {
     this.setState({value: event.target.value});
   },
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({value: nextProps.val});
+  },
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     var value = this.state.value;
@@ -46,6 +49,17 @@ var DateTimeComponent = React.createClass({
           init_data.defaultDate =  new Date(this.props.val)
         }
       $(function () { $(id).datetimepicker(init_data); });
+    }
+  },
+  componentWillReceiveProps: function(nextProps) {
+    if(this.props.method!=null){
+      var id = '#'+this.props.obj_id;
+      // Initializez campul cu data ce vreau sa o modific.
+      var init_data = {}
+      if(nextProps.val){
+          init_data.defaultDate =  new Date(nextProps.val)
+        }
+      $(function () { $(id).data("DateTimePicker").date(new Date(nextProps.val)); });
     }
   },
   render: function() {

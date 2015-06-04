@@ -123,18 +123,20 @@ var FormBox = React.createClass({
     }
     return (
       <div className="formBox">
-      <h1> Dynamic Form Builder Version 0.1 </h1>
-      <div className="row">
-        <div className="col-md-4">
-          <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
-          <br></br>
+        <div className="col-md-4"></div>
+        <h1 className="col-md-8"> Dynamic Form Builder Version 0.1 </h1>
+        <div className="row">
+          <div className="col-md-2"></div>
+          <div className="col-md-4">
+            <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
+            <br></br>
+          </div>
+          <div className="col-md-4">
+            {editpanel}
+          </div>
         </div>
-      </div>
-        <div className="col-md-7">
-        {formlist}
-        </div>
-        <div className="col-md-5">
-        {editpanel}
+        <div className="col-md-12">
+          {formlist}
         </div>
       </div>
       );
