@@ -79,6 +79,17 @@ var DateTimeComponent = React.createClass({
   }
 });
 
+var IntegerComponent = React.createClass({
+  render: function() {
+    var final_key = _.startCase(this.props.objkey);
+    return (
+      <div className="IntegerComponent">
+        <strong>{final_key}</strong> : {this.props.val}
+      </div>
+    );
+  }
+});
+
 var RelatedComponent = React.createClass({
   render: function() {
     var final_key = _.startCase(this.props.objkey);
@@ -144,6 +155,9 @@ var EditPanel = React.createClass({
               break;
             case 'related':
               content.push(React.createElement(RelatedComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
+              break;
+            case 'integer':
+              content.push(React.createElement(IntegerComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
               break;
         }
         uniquekey++;
@@ -393,6 +407,9 @@ var GenericForm = React.createClass({
             break;
           case 'related':
             content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
+            break;
+          case 'integer':
+            content.push(React.createElement(IntegerComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
             break;
         }
         uniquekey++;

@@ -48,6 +48,17 @@ var DateTimeComponent = React.createClass({
   }
 });
 
+var IntegerComponent = React.createClass({
+  render: function() {
+    var final_key = _.startCase(this.props.objkey);
+    return (
+      <div className="IntegerComponent">
+        <strong>{final_key}</strong> : {this.props.val}
+      </div>
+    );
+  }
+});
+
 var RelatedComponent = React.createClass({
   render: function() {
     var final_key = _.startCase(this.props.objkey);

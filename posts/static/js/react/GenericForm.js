@@ -42,6 +42,9 @@ var GenericForm = React.createClass({
           case 'related':
             content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
             break;
+          case 'integer':
+            content.push(React.createElement(IntegerComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
+            break;
         }
         uniquekey++;
       }.bind(this));
