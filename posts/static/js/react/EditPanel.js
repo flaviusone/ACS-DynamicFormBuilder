@@ -46,13 +46,13 @@ var EditPanel = React.createClass({
           var obj_id = uniquekey+this.props.method;
           switch(fieldType){
             case 'string':
-              content.push(React.createElement(EditStringComponent, {val: val, objkey: key, key: uniquekey, obj_id: obj_id}));
+              content.push(React.createElement(EditStringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
               break;
             case 'datetime':
-              content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
+              content.push(React.createElement(DateTimeComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
               break;
             case 'related':
-              content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
+              content.push(React.createElement(RelatedComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
               break;
         }
         uniquekey++;

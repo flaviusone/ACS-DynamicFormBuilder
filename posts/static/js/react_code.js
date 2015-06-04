@@ -51,11 +51,17 @@ var EditStringComponent = React.createClass({displayName: "EditStringComponent",
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     var value = this.state.value;
-    // console.log(this.props.key);
+    var readonly = this.props.schema.readonly;
+    var field;
+    if(readonly){
+      field = {value}
+    } else {
+      field = React.createElement("input", {id: this.props.obj_id, type: "text", value: value, onChange: this.handleChange});
+    }
     return (
       React.createElement("div", {className: "StringComponent"}, 
         React.createElement("strong", null, final_key), " :", 
-        React.createElement("input", {id: this.props.obj_id, type: "text", value: value, onChange: this.handleChange})
+        field
       )
     );
   }
@@ -131,13 +137,13 @@ var EditPanel = React.createClass({displayName: "EditPanel",
           var obj_id = uniquekey+this.props.method;
           switch(fieldType){
             case 'string':
-              content.push(React.createElement(EditStringComponent, {val: val, objkey: key, key: uniquekey, obj_id: obj_id}));
+              content.push(React.createElement(EditStringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
               break;
             case 'datetime':
-              content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
+              content.push(React.createElement(DateTimeComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
               break;
             case 'related':
-              content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
+              content.push(React.createElement(RelatedComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
               break;
         }
         uniquekey++;
