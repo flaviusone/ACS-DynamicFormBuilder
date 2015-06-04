@@ -119,24 +119,26 @@ var EditPanel = React.createClass({displayName: "EditPanel",
   render: function() {
     var content = [];
     var uniquekey = 0; // For Reconciliation
-    // debugger;
+    var object = this.props.object;
+
     if(this.props.schema){
       // Pentru fiecare prop din object
-      _.forEach(this.props.object, function (val, key){
-        // Extrag type si apelez functia corespunzatoare
-        var fieldType = this.props.schema[key].type;
-        // Un id unic ca sa il pot gasi cu getElementById
-        var obj_id = uniquekey+this.props.method;
-        switch(fieldType){
-          case 'string':
-            content.push(React.createElement(EditStringComponent, {val: val, objkey: key, key: uniquekey, obj_id: obj_id}));
-            break;
-          case 'datetime':
-            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
-            break;
-          case 'related':
-            content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
-            break;
+      _.forEach(object, function (val, key){
+          if(!this.props.schema[key]) return;
+          // Extrag type si apelez functia corespunzatoare
+          var fieldType = this.props.schema[key].type;
+          // Un id unic ca sa il pot gasi cu getElementById
+          var obj_id = uniquekey+this.props.method;
+          switch(fieldType){
+            case 'string':
+              content.push(React.createElement(EditStringComponent, {val: val, objkey: key, key: uniquekey, obj_id: obj_id}));
+              break;
+            case 'datetime':
+              content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey}));
+              break;
+            case 'related':
+              content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
+              break;
         }
         uniquekey++;
       }.bind(this));
@@ -159,6 +161,7 @@ var EditPanel = React.createClass({displayName: "EditPanel",
           React.createElement("div", {className: "panel-body"}, 
               React.createElement("form", {className: "commentForm", onSubmit: this.handleSubmit}, 
                 content.map(function (obj) { return obj;}), 
+                React.createElement("br", null), 
                 React.createElement("div", {className: "col-md-1"}), 
                 React.createElement("button", {type: "button", onClick: this.handleSubmit, className: "col-md-4 btn btn-default"}, "Submit"), 
                 React.createElement("div", {className: "col-md-2"}), 
@@ -273,9 +276,9 @@ var FormBox = React.createClass({displayName: "FormBox",
       _.forEach(this.state.schema.fields, function (val, key){
         object[key] = null;
       });
-    }
     object.author = logged_user;
     object.resource_uri = this.props.url;
+    }
     return object;
   },
   render: function() {

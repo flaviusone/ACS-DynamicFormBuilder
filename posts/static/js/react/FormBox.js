@@ -100,9 +100,9 @@ var FormBox = React.createClass({
       _.forEach(this.state.schema.fields, function (val, key){
         object[key] = null;
       });
-    }
     object.author = logged_user;
     object.resource_uri = this.props.url;
+    }
     return object;
   },
   render: function() {
