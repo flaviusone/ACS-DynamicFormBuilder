@@ -122,11 +122,58 @@ var IntegerComponent = React.createClass({displayName: "IntegerComponent",
 });
 
 var RelatedComponent = React.createClass({displayName: "RelatedComponent",
+  getInitialState: function() {
+    return {resource: {objects: null},
+            schema: {fields: null},
+            edit_data: null};
+  },
+  loadCommentsFromServer: function(url) {
+    // Load resource
+    $.ajax({
+      url: url,
+      type: 'GET',
+      contentType: 'application/json',
+      dataType: 'json',
+      success: function(data, textStatus, jqXHR) {
+        this.setState({resource: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(url, status, err.toString());
+      }.bind(this)
+    });
+    // Load schema
+    var str = url;
+    str = str.substring(0, _.lastIndexOf(str, "/", str.length-2)+1)
+    $.ajax({
+      url: str + 'schema/',
+      type: 'GET',
+      contentType: 'application/json',
+      dataType: 'json',
+      success: function(data, textStatus, jqXHR) {
+        this.setState({schema: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
+  handleEditPress: function(){
+    this.loadCommentsFromServer(this.props.val)
+  },
   render: function() {
     var final_key = _.startCase(this.props.objkey);
+    var edit_button;
+    var data_available = (this.state.resource && this.state.schema.fields);
+    if(this.props.method == "Edit"){
+      edit_button = React.createElement("button", {type: "button", onClick: this.handleEditPress, className: "btn btn-default"}, "Edit")
+    }
+    if(data_available){
+      console.log('Wololo')
+    }
     return (
       React.createElement("div", {className: "RelatedComponent"}, 
-        React.createElement("strong", null, final_key), " : ", this.props.val
+        React.createElement("strong", null, final_key), " : ", this.props.val, " ", edit_button
+
       )
     );
   }
@@ -184,7 +231,7 @@ var EditPanel = React.createClass({displayName: "EditPanel",
               content.push(React.createElement(DateTimeComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id, method: this.props.method}));
               break;
             case 'related':
-              content.push(React.createElement(RelatedComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
+              content.push(React.createElement(RelatedComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, method: this.props.method}));
               break;
             case 'integer':
               content.push(React.createElement(IntegerComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
