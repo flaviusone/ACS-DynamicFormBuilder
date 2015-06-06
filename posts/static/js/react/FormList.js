@@ -8,8 +8,10 @@ var FormList = React.createClass({
     var formNodes = this.props.resource.objects.map(function (object) {
       uniquekey++;
       return (
+        <div className="col-md-3">
         <GenericForm key={uniquekey} object={object} schema={this.props.schema} unmount_element={this.props.unmount_element} handleEdit={this.props.handleEdit}>
         </GenericForm>
+        </div>
         );
     }.bind(this));
     return (

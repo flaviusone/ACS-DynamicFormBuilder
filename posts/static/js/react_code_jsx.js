@@ -163,17 +163,45 @@ var RelatedComponent = React.createClass({
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     var edit_button;
-    var data_available = (this.state.resource && this.state.schema.fields);
+    var data_available = (this.state.resource.objects && this.state.schema.fields);
     if(this.props.method == "Edit"){
       edit_button = <button type="button" onClick={this.handleEditPress} className="btn btn-default">Edit</button>
     }
-    if(data_available){
-      console.log('Wololo')
+    var object = this.state.resource;
+    var schema = this.state.schema.fields;
+    var content = [];
+    if(object && schema){
+      var uniquekey = 0; // For Reconciliation
+      // Pentru fiecare prop din object
+      _.forEach(object, function (val, key){
+          if(!schema[key]) return;
+          // Extrag type si apelez functia corespunzatoare
+          var fieldType = schema[key].type;
+          // Un id unic ca sa il pot gasi cu getElementById
+          var obj_id = uniquekey+this.props.method;
+          switch(fieldType){
+            case 'string':
+              content.push(React.createElement(StringComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
+              break;
+            case 'datetime':
+              content.push(React.createElement(DateTimeComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey, obj_id: obj_id, method: null}));
+              break;
+            case 'related':
+              content.push(React.createElement(RelatedComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey, method: null}));
+              break;
+            case 'integer':
+              content.push(React.createElement(IntegerComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey}));
+              break;
+        }
+        uniquekey++;
+      }.bind(this));
+      content = <GenericForm object={this.state.resource} schema={this.state.schema.fields} unmount_element={null} handleEdit={null}></GenericForm>
     }
+    // {content.map(function (obj) { return obj;})}
     return (
       <div className="RelatedComponent">
         <strong>{final_key}</strong> : {this.props.val} {edit_button}
-
+        {content}
       </div>
     );
   }
@@ -431,8 +459,10 @@ var FormList = React.createClass({
     var formNodes = this.props.resource.objects.map(function (object) {
       uniquekey++;
       return (
+        <div className="col-md-3">
         <GenericForm key={uniquekey} object={object} schema={this.props.schema} unmount_element={this.props.unmount_element} handleEdit={this.props.handleEdit}>
         </GenericForm>
+        </div>
         );
     }.bind(this));
     return (
@@ -475,6 +505,7 @@ var GenericForm = React.createClass({
     if(this.props.schema){
       // Pentru fiecare prop din object
       _.forEach(this.props.object, function (val, key){
+        if(!this.props.schema[key]) return;
         // Extrag type si apelez functia corespunzatoare
         var fieldType = this.props.schema[key].type;
         switch(fieldType){
@@ -496,7 +527,7 @@ var GenericForm = React.createClass({
     }
 
     return (
-      <div className="col-md-3">
+      <div>
         <div className="panel panel-default GenericForm">
           <div className="panel-heading">
             <div className="row">

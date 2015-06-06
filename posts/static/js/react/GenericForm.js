@@ -30,6 +30,7 @@ var GenericForm = React.createClass({
     if(this.props.schema){
       // Pentru fiecare prop din object
       _.forEach(this.props.object, function (val, key){
+        if(!this.props.schema[key]) return;
         // Extrag type si apelez functia corespunzatoare
         var fieldType = this.props.schema[key].type;
         switch(fieldType){
@@ -51,7 +52,7 @@ var GenericForm = React.createClass({
     }
 
     return (
-      <div className="col-md-3">
+      <div>
         <div className="panel panel-default GenericForm">
           <div className="panel-heading">
             <div className="row">
