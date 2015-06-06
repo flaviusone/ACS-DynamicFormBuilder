@@ -2,8 +2,8 @@
 __pycache__/
 node_modules/
 *.py[cod]
-posts/static/js/react_code.js
-posts/static/js/react_code_jsx.js
+react_code.js
+react_code_jsx.js
 # C extensions
 *.so
 

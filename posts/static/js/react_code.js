@@ -425,7 +425,7 @@ var FormBox = React.createClass({displayName: "FormBox",
     return (
       React.createElement("div", {className: "formBox"}, 
         React.createElement("div", {className: "col-md-4"}), 
-        React.createElement("h1", {className: "col-md-8"}, " Dynamic Form Builder Version 0.1 "), 
+        React.createElement("h1", {className: "col-md-8"}, " Dynamic Form Builder Version 0.2 "), 
         React.createElement("div", {className: "row"}, 
           React.createElement("div", {className: "col-md-2"}), 
           React.createElement("div", {className: "col-md-4"}, 

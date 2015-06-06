@@ -124,7 +124,7 @@ var FormBox = React.createClass({
     return (
       <div className="formBox">
         <div className="col-md-4"></div>
-        <h1 className="col-md-8"> Dynamic Form Builder Version 0.1 </h1>
+        <h1 className="col-md-8"> Dynamic Form Builder Version 0.2 </h1>
         <div className="row">
           <div className="col-md-2"></div>
           <div className="col-md-4">
