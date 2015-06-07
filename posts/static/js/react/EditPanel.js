@@ -70,23 +70,19 @@ var EditPanel = React.createClass({
     }
 
     return (
-      <div className="EditPanel">
         <div className="panel panel-default EditPanel">
           <div className="panel-heading text-center">
           {this.props.method} Form
           </div>
           <div className="panel-body">
-              <form className="commentForm" onSubmit={this.handleSubmit}>
-                {content.map(function (obj) { return obj;})}
-                <br></br>
-                <div className="col-md-1"></div>
-                <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Submit</button>
-                <div className="col-md-2"></div>
-                {cancelbutton}
-              </form>
+            {content.map(function (obj) { return obj;})}
+            <br></br>
+            <div className="col-md-1"></div>
+            <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Submit</button>
+            <div className="col-md-2"></div>
+            {cancelbutton}
           </div>
         </div>
-      </div>
     );
   }
 });

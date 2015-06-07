@@ -123,19 +123,15 @@ var FormBox = React.createClass({
     }
     return (
       <div className="formBox">
-        <div className="col-md-4"></div>
-        <h1 className="col-md-8"> Dynamic Form Builder Version 0.2 </h1>
+        <nav className="navbar navbar-default navbar-fixed-top">
+          <div className="container">
+            <h3 className="col-md-12"> Dynamic Form Builder Version 0.3 </h3>
+          </div>
+        </nav>
         <div className="row">
-          <div className="col-md-2"></div>
-          <div className="col-md-4">
+          <div >
             <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
-            <br></br>
           </div>
-          <div className="col-md-4">
-            {editpanel}
-          </div>
-        </div>
-        <div className="col-md-12">
           {formlist}
         </div>
       </div>

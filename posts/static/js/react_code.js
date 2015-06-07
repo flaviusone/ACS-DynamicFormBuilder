@@ -278,23 +278,19 @@ var EditPanel = React.createClass({displayName: "EditPanel",
     }
 
     return (
-      React.createElement("div", {className: "EditPanel"}, 
         React.createElement("div", {className: "panel panel-default EditPanel"}, 
           React.createElement("div", {className: "panel-heading text-center"}, 
           this.props.method, " Form"
           ), 
           React.createElement("div", {className: "panel-body"}, 
-              React.createElement("form", {className: "commentForm", onSubmit: this.handleSubmit}, 
-                content.map(function (obj) { return obj;}), 
-                React.createElement("br", null), 
-                React.createElement("div", {className: "col-md-1"}), 
-                React.createElement("button", {type: "button", onClick: this.handleSubmit, className: "col-md-4 btn btn-default"}, "Submit"), 
-                React.createElement("div", {className: "col-md-2"}), 
-                cancelbutton
-              )
+            content.map(function (obj) { return obj;}), 
+            React.createElement("br", null), 
+            React.createElement("div", {className: "col-md-1"}), 
+            React.createElement("button", {type: "button", onClick: this.handleSubmit, className: "col-md-4 btn btn-default"}, "Submit"), 
+            React.createElement("div", {className: "col-md-2"}), 
+            cancelbutton
           )
         )
-      )
     );
   }
 });
@@ -424,19 +420,15 @@ var FormBox = React.createClass({displayName: "FormBox",
     }
     return (
       React.createElement("div", {className: "formBox"}, 
-        React.createElement("div", {className: "col-md-4"}), 
-        React.createElement("h1", {className: "col-md-8"}, " Dynamic Form Builder Version 0.2 "), 
-        React.createElement("div", {className: "row"}, 
-          React.createElement("div", {className: "col-md-2"}), 
-          React.createElement("div", {className: "col-md-4"}, 
-            React.createElement(EditPanel, {method: "Add", handleSubmit: this.handleCommentSubmit, object: this.getEmptyObject(), schema: this.state.schema.fields, unmount_edit: this.unmount_edit}), 
-            React.createElement("br", null)
-          ), 
-          React.createElement("div", {className: "col-md-4"}, 
-            editpanel
+        React.createElement("nav", {className: "navbar navbar-default navbar-fixed-top"}, 
+          React.createElement("div", {className: "container"}, 
+            React.createElement("h3", {className: "col-md-12"}, " Dynamic Form Builder Version 0.3 ")
           )
         ), 
-        React.createElement("div", {className: "col-md-12"}, 
+        React.createElement("div", {className: "row"}, 
+          React.createElement("div", null, 
+            React.createElement(EditPanel, {method: "Add", handleSubmit: this.handleCommentSubmit, object: this.getEmptyObject(), schema: this.state.schema.fields, unmount_edit: this.unmount_edit})
+          ), 
           formlist
         )
       )
@@ -459,14 +451,14 @@ var FormList = React.createClass({displayName: "FormList",
     var formNodes = this.props.resource.objects.map(function (object) {
       uniquekey++;
       return (
-        React.createElement("div", {className: "col-md-3"}, 
-        React.createElement(GenericForm, {key: uniquekey, object: object, schema: this.props.schema, unmount_element: this.props.unmount_element, handleEdit: this.props.handleEdit}
-        )
+        React.createElement("div", null, 
+          React.createElement(GenericForm, {key: uniquekey, object: object, schema: this.props.schema, unmount_element: this.props.unmount_element, handleEdit: this.props.handleEdit}
+          )
         )
         );
     }.bind(this));
     return (
-      React.createElement("div", {className: "row FormList"}, 
+      React.createElement("div", {className: "FormList"}, 
       formNodes
       )
       );
@@ -527,17 +519,15 @@ var GenericForm = React.createClass({displayName: "GenericForm",
     }
 
     return (
-      React.createElement("div", null, 
-        React.createElement("div", {className: "panel panel-default GenericForm"}, 
-          React.createElement("div", {className: "panel-heading"}, 
-            React.createElement("div", {className: "row"}, 
-              React.createElement("button", {type: "button", onClick: this.handleEditClick, className: "col-md-6 btn btn-default"}, "Edit"), 
-              React.createElement("button", {type: "button", onClick: this.handleDelClick, className: "col-md-6 btn btn-default"}, "Delete")
-            )
-          ), 
-          React.createElement("div", {className: "panel-body"}, 
-            content.map(function (obj) { return obj;})
+      React.createElement("div", {className: "panel panel-default GenericForm"}, 
+        React.createElement("div", {className: "panel-heading"}, 
+          React.createElement("div", {className: "row"}, 
+            React.createElement("button", {type: "button", onClick: this.handleEditClick, className: "col-md-6 btn btn-default"}, "Edit"), 
+            React.createElement("button", {type: "button", onClick: this.handleDelClick, className: "col-md-6 btn btn-default"}, "Delete")
           )
+        ), 
+        React.createElement("div", {className: "panel-body"}, 
+          content.map(function (obj) { return obj;})
         )
       )
       );

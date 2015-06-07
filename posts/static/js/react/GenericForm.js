@@ -52,17 +52,15 @@ var GenericForm = React.createClass({
     }
 
     return (
-      <div>
-        <div className="panel panel-default GenericForm">
-          <div className="panel-heading">
-            <div className="row">
-              <button type="button" onClick={this.handleEditClick} className="col-md-6 btn btn-default">Edit</button>
-              <button type="button" onClick={this.handleDelClick} className="col-md-6 btn btn-default">Delete</button>
-            </div>
+      <div className="panel panel-default GenericForm">
+        <div className="panel-heading">
+          <div className="row">
+            <button type="button" onClick={this.handleEditClick} className="col-md-6 btn btn-default">Edit</button>
+            <button type="button" onClick={this.handleDelClick} className="col-md-6 btn btn-default">Delete</button>
           </div>
-          <div className="panel-body">
-            {content.map(function (obj) { return obj;})}
-          </div>
+        </div>
+        <div className="panel-body">
+          {content.map(function (obj) { return obj;})}
         </div>
       </div>
       );

@@ -278,23 +278,19 @@ var EditPanel = React.createClass({
     }
 
     return (
-      <div className="EditPanel">
         <div className="panel panel-default EditPanel">
           <div className="panel-heading text-center">
           {this.props.method} Form
           </div>
           <div className="panel-body">
-              <form className="commentForm" onSubmit={this.handleSubmit}>
-                {content.map(function (obj) { return obj;})}
-                <br></br>
-                <div className="col-md-1"></div>
-                <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Submit</button>
-                <div className="col-md-2"></div>
-                {cancelbutton}
-              </form>
+            {content.map(function (obj) { return obj;})}
+            <br></br>
+            <div className="col-md-1"></div>
+            <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Submit</button>
+            <div className="col-md-2"></div>
+            {cancelbutton}
           </div>
         </div>
-      </div>
     );
   }
 });
@@ -424,19 +420,15 @@ var FormBox = React.createClass({
     }
     return (
       <div className="formBox">
-        <div className="col-md-4"></div>
-        <h1 className="col-md-8"> Dynamic Form Builder Version 0.2 </h1>
+        <nav className="navbar navbar-default navbar-fixed-top">
+          <div className="container">
+            <h3 className="col-md-12"> Dynamic Form Builder Version 0.3 </h3>
+          </div>
+        </nav>
         <div className="row">
-          <div className="col-md-2"></div>
-          <div className="col-md-4">
+          <div >
             <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
-            <br></br>
           </div>
-          <div className="col-md-4">
-            {editpanel}
-          </div>
-        </div>
-        <div className="col-md-12">
           {formlist}
         </div>
       </div>
@@ -459,14 +451,14 @@ var FormList = React.createClass({
     var formNodes = this.props.resource.objects.map(function (object) {
       uniquekey++;
       return (
-        <div className="col-md-3">
-        <GenericForm key={uniquekey} object={object} schema={this.props.schema} unmount_element={this.props.unmount_element} handleEdit={this.props.handleEdit}>
-        </GenericForm>
+        <div >
+          <GenericForm key={uniquekey} object={object} schema={this.props.schema} unmount_element={this.props.unmount_element} handleEdit={this.props.handleEdit}>
+          </GenericForm>
         </div>
         );
     }.bind(this));
     return (
-      <div className="row FormList">
+      <div className="FormList">
       {formNodes}
       </div>
       );
@@ -527,17 +519,15 @@ var GenericForm = React.createClass({
     }
 
     return (
-      <div>
-        <div className="panel panel-default GenericForm">
-          <div className="panel-heading">
-            <div className="row">
-              <button type="button" onClick={this.handleEditClick} className="col-md-6 btn btn-default">Edit</button>
-              <button type="button" onClick={this.handleDelClick} className="col-md-6 btn btn-default">Delete</button>
-            </div>
+      <div className="panel panel-default GenericForm">
+        <div className="panel-heading">
+          <div className="row">
+            <button type="button" onClick={this.handleEditClick} className="col-md-6 btn btn-default">Edit</button>
+            <button type="button" onClick={this.handleDelClick} className="col-md-6 btn btn-default">Delete</button>
           </div>
-          <div className="panel-body">
-            {content.map(function (obj) { return obj;})}
-          </div>
+        </div>
+        <div className="panel-body">
+          {content.map(function (obj) { return obj;})}
         </div>
       </div>
       );
