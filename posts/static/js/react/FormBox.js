@@ -108,30 +108,23 @@ var FormBox = React.createClass({
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
     var edit_data = this.state.edit_data;
-    var formlist, editpanel;
+    var formlist, addpanel;
 
     if (data_available) {
-      formlist = <FormList handleEdit={this.handleEditPress} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
-    } else {
-      formlist = null;
-    };
-
-    if(edit_data){
-      editpanel = <EditPanel method="Edit" handleSubmit={this.handleCommentEdit} object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
-    } else {
-      editpanel = null;
+      formlist = <FormList handleSubmit={this.handleCommentSubmit} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
+      addpanel = <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields}/>
     }
+
     return (
       <div className="formBox">
         <nav className="navbar navbar-default navbar-fixed-top">
           <div className="container">
-            <h3 className="col-md-12"> Dynamic Form Builder Version 0.3 </h3>
+            <h3> Dynamic Form Builder Version 0.3 </h3>
           </div>
         </nav>
+
         <div className="row">
-          <div >
-            <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
-          </div>
+          {addpanel}
           {formlist}
         </div>
       </div>

@@ -30,18 +30,18 @@ var AddForm = React.createClass({displayName: "AddForm",
 });
 
 
-var StringComponent = React.createClass({displayName: "StringComponent",
-  render: function() {
-    var final_key = _.startCase(this.props.objkey);
-    return (
-      React.createElement("div", {className: "StringComponent"}, 
-        React.createElement("strong", null, final_key), " : ", this.props.val
-      )
-    );
-  }
-});
+// var StringComponent = React.createClass({
+//   render: function() {
+//     var final_key = _.startCase(this.props.objkey);
+//     return (
+//       <div className="StringComponent">
+//         <strong>{final_key}</strong> : {this.props.val}
+//       </div>
+//     );
+//   }
+// });
 
-var EditStringComponent = React.createClass({displayName: "EditStringComponent",
+var StringComponent = React.createClass({displayName: "StringComponent",
   getInitialState: function() {
     return {value: this.props.val};
   },
@@ -56,11 +56,20 @@ var EditStringComponent = React.createClass({displayName: "EditStringComponent",
     var value = this.state.value;
     var readonly = this.props.schema.readonly;
     var field;
-    if(readonly){
-      field = {value}
+
+    if(this.props.display_state == "edit"){
+      if(readonly){
+        field = {value}
+      } else {
+
+        var nr_rows = Math.ceil(value.length/60);
+        console.log(value.length+" "+nr_rows);
+        field = React.createElement("textarea", {rows: nr_rows, id: this.props.obj_id, className: "form-control", type: "text", value: value, onChange: this.handleChange});
+      }
     } else {
-      field = React.createElement("input", {id: this.props.obj_id, className: "form-control", type: "text", value: value, onChange: this.handleChange});
+      field = {value}
     }
+
     return (
       React.createElement("div", {className: "StringComponent"}, 
         React.createElement("strong", null, final_key), " :", 
@@ -253,7 +262,7 @@ var EditPanel = React.createClass({displayName: "EditPanel",
           var obj_id = uniquekey+this.props.method;
           switch(fieldType){
             case 'string':
-              content.push(React.createElement(EditStringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
+              content.push(React.createElement(StringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
               break;
             case 'datetime':
               content.push(React.createElement(DateTimeComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id, method: this.props.method}));
@@ -405,30 +414,23 @@ var FormBox = React.createClass({displayName: "FormBox",
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
     var edit_data = this.state.edit_data;
-    var formlist, editpanel;
+    var formlist, addpanel;
 
     if (data_available) {
-      formlist = React.createElement(FormList, {handleEdit: this.handleEditPress, unmount_element: this.unmount_element, resource: this.state.resource, schema: this.state.schema.fields});
-    } else {
-      formlist = null;
-    };
-
-    if(edit_data){
-      editpanel = React.createElement(EditPanel, {method: "Edit", handleSubmit: this.handleCommentEdit, object: this.state.edit_data, schema: this.state.schema.fields, unmount_edit: this.unmount_edit})
-    } else {
-      editpanel = null;
+      formlist = React.createElement(FormList, {handleSubmit: this.handleCommentSubmit, unmount_element: this.unmount_element, resource: this.state.resource, schema: this.state.schema.fields});
+      addpanel = React.createElement(EditPanel, {method: "Add", handleSubmit: this.handleCommentSubmit, object: this.getEmptyObject(), schema: this.state.schema.fields})
     }
+
     return (
       React.createElement("div", {className: "formBox"}, 
         React.createElement("nav", {className: "navbar navbar-default navbar-fixed-top"}, 
           React.createElement("div", {className: "container"}, 
-            React.createElement("h3", {className: "col-md-12"}, " Dynamic Form Builder Version 0.3 ")
+            React.createElement("h3", null, " Dynamic Form Builder Version 0.3 ")
           )
         ), 
+
         React.createElement("div", {className: "row"}, 
-          React.createElement("div", null, 
-            React.createElement(EditPanel, {method: "Add", handleSubmit: this.handleCommentSubmit, object: this.getEmptyObject(), schema: this.state.schema.fields, unmount_edit: this.unmount_edit})
-          ), 
+          addpanel, 
           formlist
         )
       )
@@ -446,15 +448,12 @@ var logged_user = "/posts/api/v1/author/1/";
 **/
 var FormList = React.createClass({displayName: "FormList",
   render: function() {
-    // var formNodes;
     var uniquekey = -1; // For Reconciliation
     var formNodes = this.props.resource.objects.map(function (object) {
       uniquekey++;
       return (
-        React.createElement("div", null, 
-          React.createElement(GenericForm, {key: uniquekey, object: object, schema: this.props.schema, unmount_element: this.props.unmount_element, handleEdit: this.props.handleEdit}
+          React.createElement(GenericForm, {display_state: "show", key: uniquekey, handleSubmit: this.props.handleSubmit, unmount_element: this.props.unmount_element, object: object, schema: this.props.schema}
           )
-        )
         );
     }.bind(this));
     return (
@@ -469,7 +468,10 @@ var FormList = React.createClass({displayName: "FormList",
 * Generic form object
 **/
 var GenericForm = React.createClass({displayName: "GenericForm",
-    deleteRequest: function() {
+  getInitialState: function() {
+    return {display_state: this.props.display_state};
+  },
+  deleteRequest: function() {
    $.ajax({
      url: this.props.object.resource_uri,
      type: 'DELETE',
@@ -487,8 +489,21 @@ var GenericForm = React.createClass({displayName: "GenericForm",
     this.deleteRequest();
     this.props.unmount_element(this.props.object);
   },
+  handleCancelClick: function(){
+    this.setState({display_state: "show"})
+  },
+  handleSubmitClick: function(){
+    // Do serious stuff
+    // Din EditPanel
+    this.setState({display_state: "show"})
+  },
   handleEditClick: function() {
-    this.props.handleEdit(this.props.object);
+    if(this.state.display_state=="show"){
+      this.setState({display_state: "edit"});
+    } else {
+      this.setState({display_state: "show"});
+    }
+
   },
   render: function() {
     var content = [];
@@ -502,32 +517,54 @@ var GenericForm = React.createClass({displayName: "GenericForm",
         var fieldType = this.props.schema[key].type;
         switch(fieldType){
           case 'string':
-            content.push(React.createElement(StringComponent, {val: val, objkey: key, key: uniquekey}));
+            content.push(React.createElement(StringComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: uniquekey, display_state: this.state.display_state}));
             break;
           case 'datetime':
-            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey, method: null}));
+            content.push(React.createElement(DateTimeComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: uniquekey, display_state: this.state.display_state}));
             break;
           case 'related':
-            content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
+            content.push(React.createElement(RelatedComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: uniquekey, display_state: this.state.display_state}));
             break;
           case 'integer':
-            content.push(React.createElement(IntegerComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
+            content.push(React.createElement(IntegerComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: uniquekey, schema: this.props.schema[key], display_state: this.state.display_state}));
             break;
         }
         uniquekey++;
       }.bind(this));
     }
 
+    var submitButton, cancelButton;
+    if(this.state.display_state == "edit"){
+      submitButton = React.createElement("button", {type: "button", onClick: this.handleSubmitClick, 
+                      className: "col-md-4 btn btn-default"}, "Submit")
+      cancelButton = React.createElement("button", {type: "button", onClick: this.handleCancelClick, 
+                      className: "col-md-4 btn btn-default"}, "Cancel")
+    }
+
     return (
       React.createElement("div", {className: "panel panel-default GenericForm"}, 
         React.createElement("div", {className: "panel-heading"}, 
           React.createElement("div", {className: "row"}, 
-            React.createElement("button", {type: "button", onClick: this.handleEditClick, className: "col-md-6 btn btn-default"}, "Edit"), 
-            React.createElement("button", {type: "button", onClick: this.handleDelClick, className: "col-md-6 btn btn-default"}, "Delete")
+            React.createElement("button", {type: "button", onClick: this.handleEditClick, 
+            className: "col-md-6 btn btn-default"}, "Edit ", this.state.display_state), 
+            React.createElement("button", {type: "button", onClick: this.handleDelClick, 
+            className: "col-md-6 btn btn-default"}, "Delete")
           )
         ), 
         React.createElement("div", {className: "panel-body"}, 
-          content.map(function (obj) { return obj;})
+          content.map(function (obj) { return obj;}), 
+          React.createElement("div", {className: "col-md-1"}), 
+          submitButton, 
+          React.createElement("div", {className: "col-md-2"}), 
+          cancelButton
         )
       )
       );

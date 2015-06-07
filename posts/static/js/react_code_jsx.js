@@ -30,18 +30,18 @@ var AddForm = React.createClass({
 });
 
 
-var StringComponent = React.createClass({
-  render: function() {
-    var final_key = _.startCase(this.props.objkey);
-    return (
-      <div className="StringComponent">
-        <strong>{final_key}</strong> : {this.props.val}
-      </div>
-    );
-  }
-});
+// var StringComponent = React.createClass({
+//   render: function() {
+//     var final_key = _.startCase(this.props.objkey);
+//     return (
+//       <div className="StringComponent">
+//         <strong>{final_key}</strong> : {this.props.val}
+//       </div>
+//     );
+//   }
+// });
 
-var EditStringComponent = React.createClass({
+var StringComponent = React.createClass({
   getInitialState: function() {
     return {value: this.props.val};
   },
@@ -56,11 +56,20 @@ var EditStringComponent = React.createClass({
     var value = this.state.value;
     var readonly = this.props.schema.readonly;
     var field;
-    if(readonly){
-      field = {value}
+
+    if(this.props.display_state == "edit"){
+      if(readonly){
+        field = {value}
+      } else {
+
+        var nr_rows = Math.ceil(value.length/60);
+        console.log(value.length+" "+nr_rows);
+        field = <textarea rows={nr_rows} id={this.props.obj_id} className="form-control" type="text" value={value} onChange={this.handleChange}/>;
+      }
     } else {
-      field = <input id={this.props.obj_id} className="form-control" type="text" value={value} onChange={this.handleChange}/>;
+      field = {value}
     }
+
     return (
       <div className="StringComponent">
         <strong>{final_key}</strong> :
@@ -253,7 +262,7 @@ var EditPanel = React.createClass({
           var obj_id = uniquekey+this.props.method;
           switch(fieldType){
             case 'string':
-              content.push(React.createElement(EditStringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
+              content.push(React.createElement(StringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
               break;
             case 'datetime':
               content.push(React.createElement(DateTimeComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id, method: this.props.method}));
@@ -405,30 +414,23 @@ var FormBox = React.createClass({
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
     var edit_data = this.state.edit_data;
-    var formlist, editpanel;
+    var formlist, addpanel;
 
     if (data_available) {
-      formlist = <FormList handleEdit={this.handleEditPress} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
-    } else {
-      formlist = null;
-    };
-
-    if(edit_data){
-      editpanel = <EditPanel method="Edit" handleSubmit={this.handleCommentEdit} object={this.state.edit_data} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
-    } else {
-      editpanel = null;
+      formlist = <FormList handleSubmit={this.handleCommentSubmit} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
+      addpanel = <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields}/>
     }
+
     return (
       <div className="formBox">
         <nav className="navbar navbar-default navbar-fixed-top">
           <div className="container">
-            <h3 className="col-md-12"> Dynamic Form Builder Version 0.3 </h3>
+            <h3> Dynamic Form Builder Version 0.3 </h3>
           </div>
         </nav>
+
         <div className="row">
-          <div >
-            <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields} unmount_edit={this.unmount_edit}/>
-          </div>
+          {addpanel}
           {formlist}
         </div>
       </div>
@@ -446,15 +448,12 @@ var logged_user = "/posts/api/v1/author/1/";
 **/
 var FormList = React.createClass({
   render: function() {
-    // var formNodes;
     var uniquekey = -1; // For Reconciliation
     var formNodes = this.props.resource.objects.map(function (object) {
       uniquekey++;
       return (
-        <div >
-          <GenericForm key={uniquekey} object={object} schema={this.props.schema} unmount_element={this.props.unmount_element} handleEdit={this.props.handleEdit}>
+          <GenericForm display_state="show" key={uniquekey} handleSubmit={this.props.handleSubmit} unmount_element={this.props.unmount_element} object={object} schema={this.props.schema}>
           </GenericForm>
-        </div>
         );
     }.bind(this));
     return (
@@ -469,7 +468,10 @@ var FormList = React.createClass({
 * Generic form object
 **/
 var GenericForm = React.createClass({
-    deleteRequest: function() {
+  getInitialState: function() {
+    return {display_state: this.props.display_state};
+  },
+  deleteRequest: function() {
    $.ajax({
      url: this.props.object.resource_uri,
      type: 'DELETE',
@@ -487,8 +489,21 @@ var GenericForm = React.createClass({
     this.deleteRequest();
     this.props.unmount_element(this.props.object);
   },
+  handleCancelClick: function(){
+    this.setState({display_state: "show"})
+  },
+  handleSubmitClick: function(){
+    // Do serious stuff
+    // Din EditPanel
+    this.setState({display_state: "show"})
+  },
   handleEditClick: function() {
-    this.props.handleEdit(this.props.object);
+    if(this.state.display_state=="show"){
+      this.setState({display_state: "edit"});
+    } else {
+      this.setState({display_state: "show"});
+    }
+
   },
   render: function() {
     var content = [];
@@ -502,32 +517,54 @@ var GenericForm = React.createClass({
         var fieldType = this.props.schema[key].type;
         switch(fieldType){
           case 'string':
-            content.push(React.createElement(StringComponent, {val: val, objkey: key, key: uniquekey}));
+            content.push(React.createElement(StringComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: uniquekey, display_state: this.state.display_state}));
             break;
           case 'datetime':
-            content.push(React.createElement(DateTimeComponent, {val: val, objkey: key, key: uniquekey, method: null}));
+            content.push(React.createElement(DateTimeComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: uniquekey, display_state: this.state.display_state}));
             break;
           case 'related':
-            content.push(React.createElement(RelatedComponent, {val: val, objkey: key, key: uniquekey}));
+            content.push(React.createElement(RelatedComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: uniquekey, display_state: this.state.display_state}));
             break;
           case 'integer':
-            content.push(React.createElement(IntegerComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
+            content.push(React.createElement(IntegerComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: uniquekey, schema: this.props.schema[key], display_state: this.state.display_state}));
             break;
         }
         uniquekey++;
       }.bind(this));
     }
 
+    var submitButton, cancelButton;
+    if(this.state.display_state == "edit"){
+      submitButton = <button type="button" onClick={this.handleSubmitClick}
+                      className="col-md-4 btn btn-default">Submit</button>
+      cancelButton = <button type="button" onClick={this.handleCancelClick}
+                      className="col-md-4 btn btn-default">Cancel</button>
+    }
+
     return (
       <div className="panel panel-default GenericForm">
         <div className="panel-heading">
           <div className="row">
-            <button type="button" onClick={this.handleEditClick} className="col-md-6 btn btn-default">Edit</button>
-            <button type="button" onClick={this.handleDelClick} className="col-md-6 btn btn-default">Delete</button>
+            <button type="button" onClick={this.handleEditClick}
+            className="col-md-6 btn btn-default">Edit {this.state.display_state}</button>
+            <button type="button" onClick={this.handleDelClick}
+            className="col-md-6 btn btn-default">Delete</button>
           </div>
         </div>
         <div className="panel-body">
           {content.map(function (obj) { return obj;})}
+          <div className="col-md-1"></div>
+          {submitButton}
+          <div className="col-md-2"></div>
+          {cancelButton}
         </div>
       </div>
       );

@@ -1,16 +1,16 @@
 
-var StringComponent = React.createClass({
-  render: function() {
-    var final_key = _.startCase(this.props.objkey);
-    return (
-      <div className="StringComponent">
-        <strong>{final_key}</strong> : {this.props.val}
-      </div>
-    );
-  }
-});
+// var StringComponent = React.createClass({
+//   render: function() {
+//     var final_key = _.startCase(this.props.objkey);
+//     return (
+//       <div className="StringComponent">
+//         <strong>{final_key}</strong> : {this.props.val}
+//       </div>
+//     );
+//   }
+// });
 
-var EditStringComponent = React.createClass({
+var StringComponent = React.createClass({
   getInitialState: function() {
     return {value: this.props.val};
   },
@@ -25,11 +25,20 @@ var EditStringComponent = React.createClass({
     var value = this.state.value;
     var readonly = this.props.schema.readonly;
     var field;
-    if(readonly){
-      field = {value}
+
+    if(this.props.display_state == "edit"){
+      if(readonly){
+        field = {value}
+      } else {
+
+        var nr_rows = Math.ceil(value.length/60);
+        console.log(value.length+" "+nr_rows);
+        field = <textarea rows={nr_rows} id={this.props.obj_id} className="form-control" type="text" value={value} onChange={this.handleChange}/>;
+      }
     } else {
-      field = <input id={this.props.obj_id} className="form-control" type="text" value={value} onChange={this.handleChange}/>;
+      field = {value}
     }
+
     return (
       <div className="StringComponent">
         <strong>{final_key}</strong> :

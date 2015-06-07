@@ -45,7 +45,7 @@ var EditPanel = React.createClass({
           var obj_id = uniquekey+this.props.method;
           switch(fieldType){
             case 'string':
-              content.push(React.createElement(EditStringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
+              content.push(React.createElement(StringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
               break;
             case 'datetime':
               content.push(React.createElement(DateTimeComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id, method: this.props.method}));
