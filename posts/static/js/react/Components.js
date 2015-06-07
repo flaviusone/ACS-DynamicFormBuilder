@@ -1,15 +1,3 @@
-
-// var StringComponent = React.createClass({
-//   render: function() {
-//     var final_key = _.startCase(this.props.objkey);
-//     return (
-//       <div className="StringComponent">
-//         <strong>{final_key}</strong> : {this.props.val}
-//       </div>
-//     );
-//   }
-// });
-
 var StringComponent = React.createClass({
   getInitialState: function() {
     return {value: this.props.val};
@@ -30,9 +18,8 @@ var StringComponent = React.createClass({
       if(readonly){
         field = {value}
       } else {
-
+        if(!value) value=""; //Carpeala
         var nr_rows = Math.ceil(value.length/60);
-        console.log(value.length+" "+nr_rows);
         field = <textarea rows={nr_rows} id={this.props.obj_id} className="form-control" type="text" value={value} onChange={this.handleChange}/>;
       }
     } else {
@@ -50,7 +37,7 @@ var StringComponent = React.createClass({
 
 var DateTimeComponent = React.createClass({
   componentDidMount: function() {
-    if(this.props.method!=null){
+    if(this.props.display_state=="edit"){
       var id = '#'+this.props.obj_id;
       // Initializez campul cu data ce vreau sa o modific.
       var init_data = {}
@@ -61,7 +48,7 @@ var DateTimeComponent = React.createClass({
     }
   },
   componentWillReceiveProps: function(nextProps) {
-    if(this.props.method!=null){
+    if(this.props.display_state=="edit"){
       var id = '#'+this.props.obj_id;
       // Initializez campul cu data ce vreau sa o modific.
       var init_data = {}
@@ -75,7 +62,8 @@ var DateTimeComponent = React.createClass({
     var date = new Date(this.props.val);
     var final_key = _.startCase(this.props.objkey);
     var field;
-    if(this.props.method){
+
+    if(this.props.display_state == "edit"){
       field = <input type='text' className="form-control" id={this.props.obj_id} />
     } else {
       field = date.toUTCString();

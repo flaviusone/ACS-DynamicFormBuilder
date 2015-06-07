@@ -41,8 +41,6 @@ var GenericForm = React.createClass({
   },
   render: function() {
     var content = [];
-    var uniquekey = 0; // For Reconciliation
-    // debugger;
     if(this.props.schema){
       // Pentru fiecare prop din object
       _.forEach(this.props.object, function (val, key){
@@ -53,25 +51,24 @@ var GenericForm = React.createClass({
           case 'string':
             content.push(React.createElement(StringComponent,
                         {val: val, objkey: key, schema: this.props.schema[key],
-                         key: uniquekey, display_state: this.state.display_state}));
+                         key: _.uniqueId(), display_state: this.state.display_state, obj_id: _.uniqueId()}));
             break;
           case 'datetime':
             content.push(React.createElement(DateTimeComponent,
                         {val: val, objkey: key, schema: this.props.schema[key],
-                         key: uniquekey, display_state: this.state.display_state}));
+                         key: _.uniqueId(), display_state: this.state.display_state, obj_id: _.uniqueId()}));
             break;
           case 'related':
             content.push(React.createElement(RelatedComponent,
                         {val: val, objkey: key, schema: this.props.schema[key],
-                         key: uniquekey, display_state: this.state.display_state}));
+                         key: _.uniqueId(), display_state: this.state.display_state, obj_id: _.uniqueId()}));
             break;
           case 'integer':
             content.push(React.createElement(IntegerComponent,
                         {val: val, objkey: key, schema: this.props.schema[key],
-                         key: uniquekey, schema: this.props.schema[key], display_state: this.state.display_state}));
+                         key: _.uniqueId(), schema: this.props.schema[key], display_state: this.state.display_state, obj_id: _.uniqueId()}));
             break;
         }
-        uniquekey++;
       }.bind(this));
     }
 

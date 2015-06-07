@@ -112,7 +112,7 @@ var FormBox = React.createClass({
 
     if (data_available) {
       formlist = <FormList handleSubmit={this.handleCommentSubmit} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
-      addpanel = <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields}/>
+      addpanel = <EditPanel display_state="edit" method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields}/>
     }
 
     return (
@@ -137,3 +137,4 @@ React.render(
   document.getElementById('content')
   );
 var logged_user = "/posts/api/v1/author/1/";
+var global_id=0;

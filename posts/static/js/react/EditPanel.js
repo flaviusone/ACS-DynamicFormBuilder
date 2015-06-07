@@ -37,27 +37,32 @@ var EditPanel = React.createClass({
     var object = this.props.object;
     if(this.props.schema){
       // Pentru fiecare prop din object
-      _.forEach(object, function (val, key){
-          if(!this.props.schema[key]) return;
-          // Extrag type si apelez functia corespunzatoare
-          var fieldType = this.props.schema[key].type;
-          // Un id unic ca sa il pot gasi cu getElementById
-          var obj_id = uniquekey+this.props.method;
-          switch(fieldType){
-            case 'string':
-              content.push(React.createElement(StringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
-              break;
-            case 'datetime':
-              content.push(React.createElement(DateTimeComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id, method: this.props.method}));
-              break;
-            case 'related':
-              content.push(React.createElement(RelatedComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, method: this.props.method}));
-              break;
-            case 'integer':
-              content.push(React.createElement(IntegerComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
-              break;
+      _.forEach(this.props.object, function (val, key){
+        if(!this.props.schema[key]) return;
+        // Extrag type si apelez functia corespunzatoare
+        var fieldType = this.props.schema[key].type;
+        switch(fieldType){
+          case 'string':
+            content.push(React.createElement(StringComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: _.uniqueId(), display_state: this.props.display_state, obj_id: _.uniqueId()}));
+            break;
+          case 'datetime':
+            content.push(React.createElement(DateTimeComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: _.uniqueId(), display_state: this.props.display_state, obj_id: _.uniqueId()}));
+            break;
+          case 'related':
+            content.push(React.createElement(RelatedComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: _.uniqueId(), display_state: this.props.display_state, obj_id: _.uniqueId()}));
+            break;
+          case 'integer':
+            content.push(React.createElement(IntegerComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: _.uniqueId(), schema: this.props.schema[key], display_state: this.props.display_state, obj_id: _.uniqueId()}));
+            break;
         }
-        uniquekey++;
       }.bind(this));
     }
 

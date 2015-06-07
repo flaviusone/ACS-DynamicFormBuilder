@@ -29,18 +29,6 @@ var AddForm = React.createClass({
   }
 });
 
-
-// var StringComponent = React.createClass({
-//   render: function() {
-//     var final_key = _.startCase(this.props.objkey);
-//     return (
-//       <div className="StringComponent">
-//         <strong>{final_key}</strong> : {this.props.val}
-//       </div>
-//     );
-//   }
-// });
-
 var StringComponent = React.createClass({
   getInitialState: function() {
     return {value: this.props.val};
@@ -61,9 +49,8 @@ var StringComponent = React.createClass({
       if(readonly){
         field = {value}
       } else {
-
+        if(!value) value=""; //Carpeala
         var nr_rows = Math.ceil(value.length/60);
-        console.log(value.length+" "+nr_rows);
         field = <textarea rows={nr_rows} id={this.props.obj_id} className="form-control" type="text" value={value} onChange={this.handleChange}/>;
       }
     } else {
@@ -81,7 +68,7 @@ var StringComponent = React.createClass({
 
 var DateTimeComponent = React.createClass({
   componentDidMount: function() {
-    if(this.props.method!=null){
+    if(this.props.display_state=="edit"){
       var id = '#'+this.props.obj_id;
       // Initializez campul cu data ce vreau sa o modific.
       var init_data = {}
@@ -92,7 +79,7 @@ var DateTimeComponent = React.createClass({
     }
   },
   componentWillReceiveProps: function(nextProps) {
-    if(this.props.method!=null){
+    if(this.props.display_state=="edit"){
       var id = '#'+this.props.obj_id;
       // Initializez campul cu data ce vreau sa o modific.
       var init_data = {}
@@ -106,7 +93,8 @@ var DateTimeComponent = React.createClass({
     var date = new Date(this.props.val);
     var final_key = _.startCase(this.props.objkey);
     var field;
-    if(this.props.method){
+
+    if(this.props.display_state == "edit"){
       field = <input type='text' className="form-control" id={this.props.obj_id} />
     } else {
       field = date.toUTCString();
@@ -254,27 +242,32 @@ var EditPanel = React.createClass({
     var object = this.props.object;
     if(this.props.schema){
       // Pentru fiecare prop din object
-      _.forEach(object, function (val, key){
-          if(!this.props.schema[key]) return;
-          // Extrag type si apelez functia corespunzatoare
-          var fieldType = this.props.schema[key].type;
-          // Un id unic ca sa il pot gasi cu getElementById
-          var obj_id = uniquekey+this.props.method;
-          switch(fieldType){
-            case 'string':
-              content.push(React.createElement(StringComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
-              break;
-            case 'datetime':
-              content.push(React.createElement(DateTimeComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, obj_id: obj_id, method: this.props.method}));
-              break;
-            case 'related':
-              content.push(React.createElement(RelatedComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey, method: this.props.method}));
-              break;
-            case 'integer':
-              content.push(React.createElement(IntegerComponent, {val: val, schema: this.props.schema[key], objkey: key, key: uniquekey}));
-              break;
+      _.forEach(this.props.object, function (val, key){
+        if(!this.props.schema[key]) return;
+        // Extrag type si apelez functia corespunzatoare
+        var fieldType = this.props.schema[key].type;
+        switch(fieldType){
+          case 'string':
+            content.push(React.createElement(StringComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: _.uniqueId(), display_state: this.props.display_state, obj_id: _.uniqueId()}));
+            break;
+          case 'datetime':
+            content.push(React.createElement(DateTimeComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: _.uniqueId(), display_state: this.props.display_state, obj_id: _.uniqueId()}));
+            break;
+          case 'related':
+            content.push(React.createElement(RelatedComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: _.uniqueId(), display_state: this.props.display_state, obj_id: _.uniqueId()}));
+            break;
+          case 'integer':
+            content.push(React.createElement(IntegerComponent,
+                        {val: val, objkey: key, schema: this.props.schema[key],
+                         key: _.uniqueId(), schema: this.props.schema[key], display_state: this.props.display_state, obj_id: _.uniqueId()}));
+            break;
         }
-        uniquekey++;
       }.bind(this));
     }
 
@@ -418,7 +411,7 @@ var FormBox = React.createClass({
 
     if (data_available) {
       formlist = <FormList handleSubmit={this.handleCommentSubmit} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
-      addpanel = <EditPanel method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields}/>
+      addpanel = <EditPanel display_state="edit" method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields}/>
     }
 
     return (
@@ -443,14 +436,15 @@ React.render(
   document.getElementById('content')
   );
 var logged_user = "/posts/api/v1/author/1/";
+var global_id=0;
 /**
 * List Container for GenericForm objects
 **/
 var FormList = React.createClass({
   render: function() {
-    var uniquekey = -1; // For Reconciliation
+    var uniquekey; // For Reconciliation
     var formNodes = this.props.resource.objects.map(function (object) {
-      uniquekey++;
+      uniquekey = _.uniqueId();
       return (
           <GenericForm display_state="show" key={uniquekey} handleSubmit={this.props.handleSubmit} unmount_element={this.props.unmount_element} object={object} schema={this.props.schema}>
           </GenericForm>
@@ -507,8 +501,6 @@ var GenericForm = React.createClass({
   },
   render: function() {
     var content = [];
-    var uniquekey = 0; // For Reconciliation
-    // debugger;
     if(this.props.schema){
       // Pentru fiecare prop din object
       _.forEach(this.props.object, function (val, key){
@@ -519,25 +511,24 @@ var GenericForm = React.createClass({
           case 'string':
             content.push(React.createElement(StringComponent,
                         {val: val, objkey: key, schema: this.props.schema[key],
-                         key: uniquekey, display_state: this.state.display_state}));
+                         key: _.uniqueId(), display_state: this.state.display_state, obj_id: _.uniqueId()}));
             break;
           case 'datetime':
             content.push(React.createElement(DateTimeComponent,
                         {val: val, objkey: key, schema: this.props.schema[key],
-                         key: uniquekey, display_state: this.state.display_state}));
+                         key: _.uniqueId(), display_state: this.state.display_state, obj_id: _.uniqueId()}));
             break;
           case 'related':
             content.push(React.createElement(RelatedComponent,
                         {val: val, objkey: key, schema: this.props.schema[key],
-                         key: uniquekey, display_state: this.state.display_state}));
+                         key: _.uniqueId(), display_state: this.state.display_state, obj_id: _.uniqueId()}));
             break;
           case 'integer':
             content.push(React.createElement(IntegerComponent,
                         {val: val, objkey: key, schema: this.props.schema[key],
-                         key: uniquekey, schema: this.props.schema[key], display_state: this.state.display_state}));
+                         key: _.uniqueId(), schema: this.props.schema[key], display_state: this.state.display_state, obj_id: _.uniqueId()}));
             break;
         }
-        uniquekey++;
       }.bind(this));
     }
 
