@@ -1,46 +1,19 @@
-/**
-* Add new GenericForm
-**/
-var AddForm = React.createClass({
-  mixins: [React.addons.LinkedStateMixin],
-  getInitialState: function() {
-    return {title: '',
-            content: ''};
-  },
-  handleSubmit: function(e) {
-    e.preventDefault();
-    var title = this.state.title;
-    var content = this.state.content;
-    if (!content || !title) {
-      return;
-    }
-    this.props.onFormSubmit({author: "/posts/api/v1/author/1/",content: content, title: title});
-    this.setState({title: '',content: ''})
-    return;
-  },
-  render: function() {
-    return (
-      <form className="commentForm" onSubmit={this.handleSubmit}>
-        <input type="text" pluginsaceholder="Title" ref="title" valueLink={this.linkState('title')}/>
-        <input type="text" placeholder="Content" ref="content" valueLink={this.linkState('content')}/>
-        <input type="submit" value="Add" />
-      </form>
-      );
-  }
-});
-
 var StringComponent = React.createClass({
   getInitialState: function() {
     return {value: this.props.val};
   },
+  getValue: function(){
+    var key = this.props.objkey;
+    var value = this.state.value;
+    var obj = {};
+    obj[key] = value;
+    return obj;
+  },
   handleChange: function(event) {
     this.setState({value: event.target.value});
   },
-  componentWillReceiveProps: function(nextProps) {
-    this.setState({value: nextProps.val});
-  },
   render: function() {
-    var final_key = _.startCase(this.props.objkey);
+    var startCaseKey = _.startCase(this.props.objkey);
     var value = this.state.value;
     var readonly = this.props.schema.readonly;
     var field;
@@ -51,7 +24,8 @@ var StringComponent = React.createClass({
       } else {
         if(!value) value=""; //Carpeala
         var nr_rows = Math.ceil(value.length/60);
-        field = <textarea rows={nr_rows} id={this.props.obj_id} className="form-control" type="text" value={value} onChange={this.handleChange}/>;
+        field = <textarea rows={nr_rows} id={this.props.obj_id}
+        className="form-control" type="text" value={value} onChange={this.handleChange}/>;
       }
     } else {
       field = {value}
@@ -59,7 +33,7 @@ var StringComponent = React.createClass({
 
     return (
       <div className="StringComponent">
-        <strong>{final_key}</strong> :
+        <strong>{startCaseKey}</strong> :
         {field}
       </div>
     );
@@ -77,6 +51,13 @@ var DateTimeComponent = React.createClass({
         }
       $(function () { $(id).datetimepicker(init_data); });
     }
+  },
+  getValue: function(){
+    var key = this.props.objkey;
+    var value = this.props.val;
+    var obj = {};
+    obj[key] = value;
+    return obj;
   },
   componentWillReceiveProps: function(nextProps) {
     if(this.props.display_state=="edit"){
@@ -108,6 +89,14 @@ var DateTimeComponent = React.createClass({
 });
 
 var IntegerComponent = React.createClass({
+  getValue: function(){
+    // Implemented but not editable yet
+    var key = this.props.objkey;
+    var value = this.props.val;
+    var obj = {};
+    obj[key] = value;
+    return obj;
+  },
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     return (
@@ -122,7 +111,14 @@ var RelatedComponent = React.createClass({
   getInitialState: function() {
     return {resource: {objects: null},
             schema: {fields: null},
-            edit_data: null};
+            explore: false};
+  },
+  getValue: function(){
+    var key = this.props.objkey;
+    var value = this.props.val;
+    var obj = {};
+    obj[key] = value;
+    return obj;
   },
   loadCommentsFromServer: function(url) {
     // Load resource
@@ -156,155 +152,72 @@ var RelatedComponent = React.createClass({
   },
   handleEditPress: function(){
     this.loadCommentsFromServer(this.props.val)
+    if(this.state.explore == false){
+      this.setState({explore: true})
+    } else {
+      this.setState({explore: false})
+    }
   },
   render: function() {
-    var final_key = _.startCase(this.props.objkey);
-    var edit_button;
-    var data_available = (this.state.resource.objects && this.state.schema.fields);
-    if(this.props.method == "Edit"){
-      edit_button = <button type="button" onClick={this.handleEditPress} className="btn btn-default">Edit</button>
-    }
+    var startCaseKey = _.startCase(this.props.objkey);
     var object = this.state.resource;
     var schema = this.state.schema.fields;
     var content = [];
-    if(object && schema){
-      var uniquekey = 0; // For Reconciliation
-      // Pentru fiecare prop din object
-      _.forEach(object, function (val, key){
-          if(!schema[key]) return;
-          // Extrag type si apelez functia corespunzatoare
-          var fieldType = schema[key].type;
-          // Un id unic ca sa il pot gasi cu getElementById
-          var obj_id = uniquekey+this.props.method;
-          switch(fieldType){
-            case 'string':
-              content.push(React.createElement(StringComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
-              break;
-            case 'datetime':
-              content.push(React.createElement(DateTimeComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey, obj_id: obj_id, method: null}));
-              break;
-            case 'related':
-              content.push(React.createElement(RelatedComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey, method: null}));
-              break;
-            case 'integer':
-              content.push(React.createElement(IntegerComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey}));
-              break;
-        }
-        uniquekey++;
-      }.bind(this));
-      content = <GenericForm object={this.state.resource} schema={this.state.schema.fields} unmount_element={null} handleEdit={null}></GenericForm>
+    var edit_button;
+
+    if(this.props.display_state == "edit"){
+      edit_button = <button type="button" onClick={this.handleEditPress} className="btn btn-default">Edit</button>
     }
-    // {content.map(function (obj) { return obj;})}
+
+    if(object && schema && this.state.explore){
+      content = <GenericForm display_state="show" object={object}
+                schema={schema} unmount_element={this.props.unmount_element}
+                handleSubmit={this.props.handleSubmit}></GenericForm>
+    }
+
     return (
       <div className="RelatedComponent">
-        <strong>{final_key}</strong> : {this.props.val} {edit_button}
+        <strong>{startCaseKey}</strong> : {this.props.val} {edit_button}
         {content}
       </div>
     );
   }
 });
-
-var EditPanel = React.createClass({
-  handleSubmit: function(e){
-    var uniquekey = 0;
-    var requestObj = {};
-    if(this.props.schema){
-      // Pentru fiecare prop din object
-      _.forEach(this.props.object, function (val, key){
-         var obj_id = uniquekey+this.props.method;
-         // Citesc din campurile modificabile
-         var inputVal = document.getElementById(obj_id);
-         if(inputVal){
-           // Adauga la obiect key:inputVal.value
-           requestObj[key] = inputVal.value;
-         }else{
-           // Adauga la obiect key:value
-           requestObj[key] = val;
-         }
-        uniquekey++;
-      }.bind(this));
-    }
-  // Ajax request
-  this.props.handleSubmit(requestObj, this.props.method);
-
-  if(this.props.method=="Edit"){
-    this.props.unmount_edit();
-  }
-
-  return;
-  },
-  handleCancelClick: function(){
-    this.props.unmount_edit();
-  },
-  render: function() {
-    var content = [];
-    var uniquekey = 0; // For Reconciliation
-    var object = this.props.object;
-    if(this.props.schema){
-      // Pentru fiecare prop din object
-      _.forEach(this.props.object, function (val, key){
-        if(!this.props.schema[key]) return;
-        // Extrag type si apelez functia corespunzatoare
-        var fieldType = this.props.schema[key].type;
-        switch(fieldType){
-          case 'string':
-            content.push(React.createElement(StringComponent,
-                        {val: val, objkey: key, schema: this.props.schema[key],
-                         key: _.uniqueId(), display_state: this.props.display_state, obj_id: _.uniqueId()}));
-            break;
-          case 'datetime':
-            content.push(React.createElement(DateTimeComponent,
-                        {val: val, objkey: key, schema: this.props.schema[key],
-                         key: _.uniqueId(), display_state: this.props.display_state, obj_id: _.uniqueId()}));
-            break;
-          case 'related':
-            content.push(React.createElement(RelatedComponent,
-                        {val: val, objkey: key, schema: this.props.schema[key],
-                         key: _.uniqueId(), display_state: this.props.display_state, obj_id: _.uniqueId()}));
-            break;
-          case 'integer':
-            content.push(React.createElement(IntegerComponent,
-                        {val: val, objkey: key, schema: this.props.schema[key],
-                         key: _.uniqueId(), schema: this.props.schema[key], display_state: this.props.display_state, obj_id: _.uniqueId()}));
-            break;
-        }
-      }.bind(this));
-    }
-
-    // Display only on the edit form
-    var cancelbutton;
-    if(this.props.method == "Edit"){
-      cancelbutton = <button type="button" onClick={this.handleCancelClick} className="col-md-4 btn btn-default">Cancel</button>
-    } else {
-      cancelbutton = "";
-    }
-
-    return (
-        <div className="panel panel-default EditPanel">
-          <div className="panel-heading text-center">
-          {this.props.method} Form
-          </div>
-          <div className="panel-body">
-            {content.map(function (obj) { return obj;})}
-            <br></br>
-            <div className="col-md-1"></div>
-            <button type="button" onClick={this.handleSubmit} className="col-md-4 btn btn-default">Submit</button>
-            <div className="col-md-2"></div>
-            {cancelbutton}
-          </div>
-        </div>
-    );
-  }
-});
-
 /**
 * Main container
 **/
 var FormBox = React.createClass({
   getInitialState: function() {
     return {resource: {objects: null},
-            schema: {fields: null},
-            edit_data: null};
+            schema: {fields: null}};
+  },
+  shouldComponentUpdate: function(nextProps, nextState) {
+    // Don't rerender untill objects and schema are available
+    return (nextState.resource.objects && nextState.schema.fields )
+  },
+  unmount_element: function(object){
+    var resource = this.state.resource;
+    var removed = _.remove(resource.objects, function(obj) {
+      return obj.id == object.id;
+    });
+    this.setState(resource);
+  },
+  componentDidMount: function() {
+    this.loadCommentsFromServer();
+  },
+  getEmptyObject: function() {
+    // Gets an empty object corresponding to the schema
+    // Used on the Add form
+    var object = {};
+    var data_available = this.state.schema.fields;
+    if(data_available){
+      _.forEach(this.state.schema.fields, function (val, key){
+        object[key] = null;
+      });
+    object.author = logged_user;
+    object.resource_uri = this.props.url;
+    }
+    return object;
   },
   loadCommentsFromServer: function() {
     // Load resource
@@ -334,23 +247,6 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
-  shouldComponentUpdate: function(nextProps, nextState) {
-    // Don't rerender untill objects and schema are available
-    return (nextState.resource.objects && nextState.schema.fields )
-  },
-  unmount_element: function(object){
-    var resource = this.state.resource;
-    var removed = _.remove(resource.objects, function(obj) {
-      return obj.id == object.id;
-    });
-    this.setState(resource);
-  },
-  unmount_edit: function(){
-    this.setState({edit_data: null})
-  },
-  handleEditPress: function(object){
-    this.setState({edit_data: object})
-  },
   handleCommentSubmit: function(object) {
     $.ajax({
       url: this.props.url,
@@ -368,7 +264,7 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
-  handleCommentEdit: function(object, method) {
+  handleCommentEdit: function(object) {
     $.ajax({
       url: object.resource_uri,
       type: 'PATCH',
@@ -387,31 +283,26 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
-  componentDidMount: function() {
-    this.loadCommentsFromServer();
-  },
-  getEmptyObject: function() {
-    // Gets an empty object corresponding to the schema
-    // Used on the Add form
-    var object = {};
-    var data_available = this.state.schema.fields;
-    if(data_available){
-      _.forEach(this.state.schema.fields, function (val, key){
-        object[key] = null;
-      });
-    object.author = logged_user;
-    object.resource_uri = this.props.url;
-    }
-    return object;
-  },
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
-    var edit_data = this.state.edit_data;
-    var formlist, addpanel;
+    var formlist, addPanel;
 
     if (data_available) {
-      formlist = <FormList handleSubmit={this.handleCommentSubmit} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
-      addpanel = <EditPanel display_state="edit" method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields}/>
+      addPanel =<GenericForm
+                    optional="add"
+                    display_state="edit"
+                    handleSubmit={this.props.handleSubmit}
+                    unmount_element={this.props.unmount_element}
+                    object={this.getEmptyObject()}
+                    schema={this.state.schema.fields}
+                    handleSubmit={this.handleCommentSubmit}>
+                </GenericForm>
+      formlist =<FormList
+                    handleSubmit={this.handleCommentEdit}
+                    unmount_element={this.unmount_element}
+                    resource={this.state.resource}
+                    schema={this.state.schema.fields}>
+                </FormList>;
     }
 
     return (
@@ -423,7 +314,7 @@ var FormBox = React.createClass({
         </nav>
 
         <div className="row">
-          {addpanel}
+          {addPanel}
           {formlist}
         </div>
       </div>
@@ -436,15 +327,15 @@ React.render(
   document.getElementById('content')
   );
 var logged_user = "/posts/api/v1/author/1/";
-var global_id=0;
 /**
 * List Container for GenericForm objects
 **/
 var FormList = React.createClass({
   render: function() {
-    var uniquekey; // For Reconciliation
+    var uniquekey=0; // For Reconciliation
     var formNodes = this.props.resource.objects.map(function (object) {
-      uniquekey = _.uniqueId();
+      uniquekey++;
+      // uniquekey = _.uniqueId();
       return (
           <GenericForm display_state="show" key={uniquekey} handleSubmit={this.props.handleSubmit} unmount_element={this.props.unmount_element} object={object} schema={this.props.schema}>
           </GenericForm>
@@ -480,58 +371,98 @@ var GenericForm = React.createClass({
    });
   },
   handleDelClick: function() {
+    /**
+    * Sends a delete ajax request and unmounts the element
+    **/
     this.deleteRequest();
     this.props.unmount_element(this.props.object);
   },
   handleCancelClick: function(){
+    /**
+    * Cancels the edit form transforming it back into a show form
+    **/
     this.setState({display_state: "show"})
   },
   handleSubmitClick: function(){
-    // Do serious stuff
-    // Din EditPanel
+    /**
+    * Calls getValue function from each child (using this.refs)
+    * Merges the answers into a request payload object
+    * Calls handleSubmit from parent
+    **/
+    var requestObj = {};
+    _.forEach(this.refs, function (component){
+      var componentData = component.getValue();
+      if(componentData){
+        _.merge(requestObj, componentData)
+      }
+    }.bind(this))
+
+    this.props.handleSubmit(requestObj);
     this.setState({display_state: "show"})
+
+    if(this.props.optional == "add"){
+      this.setState({display_state: "edit"})
+    }
   },
   handleEditClick: function() {
+    /**
+    * Handles edit button press
+    * Changes states from show to edit and viceversa
+    **/
     if(this.state.display_state=="show"){
       this.setState({display_state: "edit"});
     } else {
       this.setState({display_state: "show"});
     }
-
+  },
+  generateGenericComponents: function(){
+    /**
+    * Generates generic react components based on a object and schema
+    **/
+    var content = [];
+    var uniquekey = -1;
+    var elementIds = [];
+    var refcounter=0;
+    // Pentru fiecare prop din object
+    _.forEach(this.props.object, function (val, key){
+      if(!this.props.schema[key]) return;
+      // Extrag type si apelez functia corespunzatoare
+      var fieldType = this.props.schema[key].type;
+      refcounter++;
+      uniquekey++;
+      uniquekey = _.uniqueId();
+      var uniqueId = _.uniqueId();
+      switch(fieldType){
+        case 'string':
+          content.push(React.createElement(StringComponent,
+                      {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
+                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, obj_id: uniqueId}));
+          break;
+        case 'datetime':
+          content.push(React.createElement(DateTimeComponent,
+                      {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
+                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, obj_id: uniqueId}));
+          break;
+        case 'related':
+          content.push(React.createElement(RelatedComponent,
+                      {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
+                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, handleSubmit: this.props.handleSubmit, unmount_element: this.props.unmount_element,  obj_id: uniqueId}));
+          break;
+        case 'integer':
+          content.push(React.createElement(IntegerComponent,
+                      {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
+                       key: uniquekey, schema: this.props.schema[key], display_state: this.state.display_state,update: this.handlechildUpdate, obj_id: uniqueId}));
+          break;
+      }
+    }.bind(this));
+    return content;
   },
   render: function() {
-    var content = [];
-    if(this.props.schema){
-      // Pentru fiecare prop din object
-      _.forEach(this.props.object, function (val, key){
-        if(!this.props.schema[key]) return;
-        // Extrag type si apelez functia corespunzatoare
-        var fieldType = this.props.schema[key].type;
-        switch(fieldType){
-          case 'string':
-            content.push(React.createElement(StringComponent,
-                        {val: val, objkey: key, schema: this.props.schema[key],
-                         key: _.uniqueId(), display_state: this.state.display_state, obj_id: _.uniqueId()}));
-            break;
-          case 'datetime':
-            content.push(React.createElement(DateTimeComponent,
-                        {val: val, objkey: key, schema: this.props.schema[key],
-                         key: _.uniqueId(), display_state: this.state.display_state, obj_id: _.uniqueId()}));
-            break;
-          case 'related':
-            content.push(React.createElement(RelatedComponent,
-                        {val: val, objkey: key, schema: this.props.schema[key],
-                         key: _.uniqueId(), display_state: this.state.display_state, obj_id: _.uniqueId()}));
-            break;
-          case 'integer':
-            content.push(React.createElement(IntegerComponent,
-                        {val: val, objkey: key, schema: this.props.schema[key],
-                         key: _.uniqueId(), schema: this.props.schema[key], display_state: this.state.display_state, obj_id: _.uniqueId()}));
-            break;
-        }
-      }.bind(this));
-    }
 
+    // Generate generic compoennts
+    var content = this.generateGenericComponents();
+
+    // Generate submit and cancel buttons
     var submitButton, cancelButton;
     if(this.state.display_state == "edit"){
       submitButton = <button type="button" onClick={this.handleSubmitClick}
@@ -540,15 +471,25 @@ var GenericForm = React.createClass({
                       className="col-md-4 btn btn-default">Cancel</button>
     }
 
+    // Generate edit and delete buttons
+    // Omit theese in case of add form
+    var panelTitle;
+    if(this.props.optional == "add"){
+      panelTitle = "Add Form"
+      cancelButton = ""
+    } else {
+      panelTitle = (<div className="row">
+                    <button type="button" onClick={this.handleEditClick}
+                    className="col-md-6 btn btn-default">Edit {this.state.display_state}</button>
+                    <button type="button" onClick={this.handleDelClick}
+                    className="col-md-6 btn btn-default">Delete</button>
+                    </div>)
+    }
+
     return (
       <div className="panel panel-default GenericForm">
-        <div className="panel-heading">
-          <div className="row">
-            <button type="button" onClick={this.handleEditClick}
-            className="col-md-6 btn btn-default">Edit {this.state.display_state}</button>
-            <button type="button" onClick={this.handleDelClick}
-            className="col-md-6 btn btn-default">Delete</button>
-          </div>
+        <div className="panel-heading text-center">
+          {panelTitle}
         </div>
         <div className="panel-body">
           {content.map(function (obj) { return obj;})}

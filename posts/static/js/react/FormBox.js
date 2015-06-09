@@ -4,8 +4,35 @@
 var FormBox = React.createClass({
   getInitialState: function() {
     return {resource: {objects: null},
-            schema: {fields: null},
-            edit_data: null};
+            schema: {fields: null}};
+  },
+  shouldComponentUpdate: function(nextProps, nextState) {
+    // Don't rerender untill objects and schema are available
+    return (nextState.resource.objects && nextState.schema.fields )
+  },
+  unmount_element: function(object){
+    var resource = this.state.resource;
+    var removed = _.remove(resource.objects, function(obj) {
+      return obj.id == object.id;
+    });
+    this.setState(resource);
+  },
+  componentDidMount: function() {
+    this.loadCommentsFromServer();
+  },
+  getEmptyObject: function() {
+    // Gets an empty object corresponding to the schema
+    // Used on the Add form
+    var object = {};
+    var data_available = this.state.schema.fields;
+    if(data_available){
+      _.forEach(this.state.schema.fields, function (val, key){
+        object[key] = null;
+      });
+    object.author = logged_user;
+    object.resource_uri = this.props.url;
+    }
+    return object;
   },
   loadCommentsFromServer: function() {
     // Load resource
@@ -35,23 +62,6 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
-  shouldComponentUpdate: function(nextProps, nextState) {
-    // Don't rerender untill objects and schema are available
-    return (nextState.resource.objects && nextState.schema.fields )
-  },
-  unmount_element: function(object){
-    var resource = this.state.resource;
-    var removed = _.remove(resource.objects, function(obj) {
-      return obj.id == object.id;
-    });
-    this.setState(resource);
-  },
-  unmount_edit: function(){
-    this.setState({edit_data: null})
-  },
-  handleEditPress: function(object){
-    this.setState({edit_data: object})
-  },
   handleCommentSubmit: function(object) {
     $.ajax({
       url: this.props.url,
@@ -69,7 +79,7 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
-  handleCommentEdit: function(object, method) {
+  handleCommentEdit: function(object) {
     $.ajax({
       url: object.resource_uri,
       type: 'PATCH',
@@ -88,31 +98,26 @@ var FormBox = React.createClass({
       }.bind(this)
     });
   },
-  componentDidMount: function() {
-    this.loadCommentsFromServer();
-  },
-  getEmptyObject: function() {
-    // Gets an empty object corresponding to the schema
-    // Used on the Add form
-    var object = {};
-    var data_available = this.state.schema.fields;
-    if(data_available){
-      _.forEach(this.state.schema.fields, function (val, key){
-        object[key] = null;
-      });
-    object.author = logged_user;
-    object.resource_uri = this.props.url;
-    }
-    return object;
-  },
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
-    var edit_data = this.state.edit_data;
-    var formlist, addpanel;
+    var formlist, addPanel;
 
     if (data_available) {
-      formlist = <FormList handleSubmit={this.handleCommentSubmit} unmount_element={this.unmount_element} resource={this.state.resource} schema={this.state.schema.fields}/>;
-      addpanel = <EditPanel display_state="edit" method="Add" handleSubmit={this.handleCommentSubmit} object={this.getEmptyObject()} schema={this.state.schema.fields}/>
+      addPanel =<GenericForm
+                    optional="add"
+                    display_state="edit"
+                    handleSubmit={this.props.handleSubmit}
+                    unmount_element={this.props.unmount_element}
+                    object={this.getEmptyObject()}
+                    schema={this.state.schema.fields}
+                    handleSubmit={this.handleCommentSubmit}>
+                </GenericForm>
+      formlist =<FormList
+                    handleSubmit={this.handleCommentEdit}
+                    unmount_element={this.unmount_element}
+                    resource={this.state.resource}
+                    schema={this.state.schema.fields}>
+                </FormList>;
     }
 
     return (
@@ -124,7 +129,7 @@ var FormBox = React.createClass({
         </nav>
 
         <div className="row">
-          {addpanel}
+          {addPanel}
           {formlist}
         </div>
       </div>
@@ -137,4 +142,3 @@ React.render(
   document.getElementById('content')
   );
 var logged_user = "/posts/api/v1/author/1/";
-var global_id=0;

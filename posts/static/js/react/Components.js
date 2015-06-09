@@ -2,14 +2,18 @@ var StringComponent = React.createClass({
   getInitialState: function() {
     return {value: this.props.val};
   },
+  getValue: function(){
+    var key = this.props.objkey;
+    var value = this.state.value;
+    var obj = {};
+    obj[key] = value;
+    return obj;
+  },
   handleChange: function(event) {
     this.setState({value: event.target.value});
   },
-  componentWillReceiveProps: function(nextProps) {
-    this.setState({value: nextProps.val});
-  },
   render: function() {
-    var final_key = _.startCase(this.props.objkey);
+    var startCaseKey = _.startCase(this.props.objkey);
     var value = this.state.value;
     var readonly = this.props.schema.readonly;
     var field;
@@ -20,7 +24,8 @@ var StringComponent = React.createClass({
       } else {
         if(!value) value=""; //Carpeala
         var nr_rows = Math.ceil(value.length/60);
-        field = <textarea rows={nr_rows} id={this.props.obj_id} className="form-control" type="text" value={value} onChange={this.handleChange}/>;
+        field = <textarea rows={nr_rows} id={this.props.obj_id}
+        className="form-control" type="text" value={value} onChange={this.handleChange}/>;
       }
     } else {
       field = {value}
@@ -28,7 +33,7 @@ var StringComponent = React.createClass({
 
     return (
       <div className="StringComponent">
-        <strong>{final_key}</strong> :
+        <strong>{startCaseKey}</strong> :
         {field}
       </div>
     );
@@ -46,6 +51,13 @@ var DateTimeComponent = React.createClass({
         }
       $(function () { $(id).datetimepicker(init_data); });
     }
+  },
+  getValue: function(){
+    var key = this.props.objkey;
+    var value = this.props.val;
+    var obj = {};
+    obj[key] = value;
+    return obj;
   },
   componentWillReceiveProps: function(nextProps) {
     if(this.props.display_state=="edit"){
@@ -77,6 +89,14 @@ var DateTimeComponent = React.createClass({
 });
 
 var IntegerComponent = React.createClass({
+  getValue: function(){
+    // Implemented but not editable yet
+    var key = this.props.objkey;
+    var value = this.props.val;
+    var obj = {};
+    obj[key] = value;
+    return obj;
+  },
   render: function() {
     var final_key = _.startCase(this.props.objkey);
     return (
@@ -91,7 +111,14 @@ var RelatedComponent = React.createClass({
   getInitialState: function() {
     return {resource: {objects: null},
             schema: {fields: null},
-            edit_data: null};
+            explore: false};
+  },
+  getValue: function(){
+    var key = this.props.objkey;
+    var value = this.props.val;
+    var obj = {};
+    obj[key] = value;
+    return obj;
   },
   loadCommentsFromServer: function(url) {
     // Load resource
@@ -125,48 +152,32 @@ var RelatedComponent = React.createClass({
   },
   handleEditPress: function(){
     this.loadCommentsFromServer(this.props.val)
+    if(this.state.explore == false){
+      this.setState({explore: true})
+    } else {
+      this.setState({explore: false})
+    }
   },
   render: function() {
-    var final_key = _.startCase(this.props.objkey);
-    var edit_button;
-    var data_available = (this.state.resource.objects && this.state.schema.fields);
-    if(this.props.method == "Edit"){
-      edit_button = <button type="button" onClick={this.handleEditPress} className="btn btn-default">Edit</button>
-    }
+    var startCaseKey = _.startCase(this.props.objkey);
     var object = this.state.resource;
     var schema = this.state.schema.fields;
     var content = [];
-    if(object && schema){
-      var uniquekey = 0; // For Reconciliation
-      // Pentru fiecare prop din object
-      _.forEach(object, function (val, key){
-          if(!schema[key]) return;
-          // Extrag type si apelez functia corespunzatoare
-          var fieldType = schema[key].type;
-          // Un id unic ca sa il pot gasi cu getElementById
-          var obj_id = uniquekey+this.props.method;
-          switch(fieldType){
-            case 'string':
-              content.push(React.createElement(StringComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey, obj_id: obj_id}));
-              break;
-            case 'datetime':
-              content.push(React.createElement(DateTimeComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey, obj_id: obj_id, method: null}));
-              break;
-            case 'related':
-              content.push(React.createElement(RelatedComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey, method: null}));
-              break;
-            case 'integer':
-              content.push(React.createElement(IntegerComponent, {val: val, schema: schema[key], objkey: key, key: uniquekey}));
-              break;
-        }
-        uniquekey++;
-      }.bind(this));
-      content = <GenericForm object={this.state.resource} schema={this.state.schema.fields} unmount_element={null} handleEdit={null}></GenericForm>
+    var edit_button;
+
+    if(this.props.display_state == "edit"){
+      edit_button = <button type="button" onClick={this.handleEditPress} className="btn btn-default">Edit</button>
     }
-    // {content.map(function (obj) { return obj;})}
+
+    if(object && schema && this.state.explore){
+      content = <GenericForm display_state="show" object={object}
+                schema={schema} unmount_element={this.props.unmount_element}
+                handleSubmit={this.props.handleSubmit}></GenericForm>
+    }
+
     return (
       <div className="RelatedComponent">
-        <strong>{final_key}</strong> : {this.props.val} {edit_button}
+        <strong>{startCaseKey}</strong> : {this.props.val} {edit_button}
         {content}
       </div>
     );
