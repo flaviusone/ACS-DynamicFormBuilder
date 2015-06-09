@@ -53,22 +53,13 @@ var DateTimeComponent = React.createClass({
     }
   },
   getValue: function(){
+    var id = '#'+this.props.obj_id;
     var key = this.props.objkey;
-    var value = this.props.val;
+    var value = $(id).data("DateTimePicker").date()
+    // var value = this.state.value;
     var obj = {};
     obj[key] = value;
     return obj;
-  },
-  componentWillReceiveProps: function(nextProps) {
-    if(this.props.display_state=="edit"){
-      var id = '#'+this.props.obj_id;
-      // Initializez campul cu data ce vreau sa o modific.
-      var init_data = {}
-      if(nextProps.val){
-          init_data.defaultDate =  new Date(nextProps.val)
-        }
-      $(function () { $(id).data("DateTimePicker").date(new Date(nextProps.val)); });
-    }
   },
   render: function() {
     var date = new Date(this.props.val);

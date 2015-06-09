@@ -129,7 +129,9 @@ var FormBox = React.createClass({
         </nav>
 
         <div className="row">
+        <div className="col-md-3">
           {addPanel}
+        </div>
           {formlist}
         </div>
       </div>
