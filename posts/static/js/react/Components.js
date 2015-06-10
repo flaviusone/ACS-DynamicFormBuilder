@@ -42,6 +42,9 @@ var StringComponent = React.createClass({
 });
 
 var DateTimeComponent = React.createClass({
+  componentDidMount: function(){
+    this.componentDidUpdate();
+  },
   componentDidUpdate: function(){
     if(this.props.display_state=="edit"){
       var init_data = {}

@@ -87,13 +87,10 @@ var FormBox = React.createClass({
       contentType: 'application/json',
       data: JSON.stringify(object),
       success: function(data) {
-        //TODO add _.cloneDeep
-        // sau react addons.update (react immutability helpers pe google)
-        var new_data = this.state.resource;
-        // Caut indexul vechului element care a fost updatat ca sa il suprascriu
-        // TODO _.findWhere in loc de asta de jos.
-        var index = _.findIndex(this.state.resource.objects, _.matchesProperty('resource_uri', data.resource_uri));
-        new_data.objects[index] = data;
+        var new_data = _.cloneDeep(this.state.resource);
+        // Update the element with response from server
+        var newObj = _.findWhere(new_data, {'resource_uri' : data.resource_uri});
+        newObj = data;
         this.setState({resource: new_data});
       }.bind(this),
       error: function(xhr, status, err) {
@@ -147,9 +144,3 @@ React.render(
   document.getElementById('content')
   );
 var logged_user = "/posts/api/v1/author/1/";
-
-        // // <div className="row">
-        // <div className="parent">
-        // // <div className="col-md-3">
-        //   {addPanel}
-        // // </div>
