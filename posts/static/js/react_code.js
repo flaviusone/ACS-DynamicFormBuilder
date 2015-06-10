@@ -257,7 +257,7 @@ var FormBox = React.createClass({displayName: "FormBox",
       contentType: 'application/json',
       data: JSON.stringify(object),
       success: function(data) {
-        var new_data = this.state.resource;
+        var new_data =  _.cloneDeep(this.state.resource);
         new_data.objects.push(data);
         this.setState({resource: new_data});
       }.bind(this),
@@ -332,27 +332,25 @@ var FormList = React.createClass({displayName: "FormList",
               schema: this.props.schema, 
               handleSubmit: this.props.handleSubmit}
           )
-    var formNodes = this.props.resource.objects.map(function (object) {
+    var formNodes = [];
+    _.forEach(this.props.resource.objects, function(object){
       uniquekey++;
-      return (
-        React.createElement("div", {key: uniquekey, className: "childul"}, 
-          React.createElement(GenericForm, {display_state: "show", 
-                       handleSubmit: this.props.handleEdit, 
-                       unmount_element: this.props.unmount_element, 
-                       object: object, 
-                       schema: this.props.schema}
-          )
-        )
-        );
+      formNodes.push(React.createElement("div", {key: uniquekey, className: "childul"}, 
+                        React.createElement(GenericForm, {display_state: "show", 
+                                     handleSubmit: this.props.handleEdit, 
+                                     unmount_element: this.props.unmount_element, 
+                                     object: object, 
+                                     schema: this.props.schema}
+                        )
+                      ));
     }.bind(this));
+    formNodes.reverse();
     return (
       React.createElement("div", {className: "parent"}, 
-
-        formNodes, 
         React.createElement("div", {key: uniquekey++, className: "childul"}, 
           addPanel
-        )
-
+        ), 
+        formNodes
       )
       );
   }

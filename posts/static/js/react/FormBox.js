@@ -70,7 +70,7 @@ var FormBox = React.createClass({
       contentType: 'application/json',
       data: JSON.stringify(object),
       success: function(data) {
-        var new_data = this.state.resource;
+        var new_data =  _.cloneDeep(this.state.resource);
         new_data.objects.push(data);
         this.setState({resource: new_data});
       }.bind(this),
