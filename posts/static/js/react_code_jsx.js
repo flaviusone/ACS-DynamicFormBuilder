@@ -24,8 +24,9 @@ var StringComponent = React.createClass({
       } else {
         if(!value) value=""; //Carpeala
         var nr_rows = Math.ceil(value.length/60);
-        field = <textarea rows={nr_rows} id={this.props.obj_id}
-        className="form-control" type="text" value={value} onChange={this.handleChange}/>;
+        field = <textarea rows={nr_rows}
+                          className="form-control" type="text"
+                          value={value} onChange={this.handleChange}/>;
       }
     } else {
       field = {value}
@@ -41,23 +42,20 @@ var StringComponent = React.createClass({
 });
 
 var DateTimeComponent = React.createClass({
-  componentDidMount: function() {
+  componentDidUpdate: function(){
     if(this.props.display_state=="edit"){
-      var id = '#'+this.props.obj_id;
-      // Initializez campul cu data ce vreau sa o modific.
       var init_data = {}
       if(this.props.val){
           init_data.defaultDate =  new Date(this.props.val)
-        }
-        // TODO this.getdomnode
-      $(function () { $(id).datetimepicker(init_data); });
+      }
+      var node = React.findDOMNode(this.refs.dateinput);
+      $(node).datetimepicker(init_data)
     }
   },
   getValue: function(){
-    var id = '#'+this.props.obj_id;
     var key = this.props.objkey;
-    var value = $(id).data("DateTimePicker").date()
-    // var value = this.state.value;
+    var node = React.findDOMNode(this.refs.dateinput);
+    var value = $(node).data("DateTimePicker").date()
     var obj = {};
     obj[key] = value;
     return obj;
@@ -68,7 +66,7 @@ var DateTimeComponent = React.createClass({
     var field;
 
     if(this.props.display_state == "edit"){
-      field = <input type='text' className="form-control" id={this.props.obj_id} />
+      field = <input type='text' className="form-control" ref="dateinput"/>
     } else {
       field = date.toUTCString();
     }
@@ -349,8 +347,8 @@ var FormList = React.createClass({
       uniquekey++;
       // uniquekey = _.uniqueId();
       return (
-        <div className="col-md-3">
-          <GenericForm display_state="show" key={uniquekey} handleSubmit={this.props.handleSubmit} unmount_element={this.props.unmount_element} object={object} schema={this.props.schema}>
+        <div key={uniquekey} className="col-md-3">
+          <GenericForm display_state="show" handleSubmit={this.props.handleSubmit} unmount_element={this.props.unmount_element} object={object} schema={this.props.schema}>
           </GenericForm>
         </div>
         );
@@ -444,28 +442,26 @@ var GenericForm = React.createClass({
       var fieldType = this.props.schema[key].type;
       refcounter++;
       uniquekey++;
-      uniquekey = _.uniqueId(); //TODO o sa scot asta
-      var uniqueId = _.uniqueId();
       switch(fieldType){
         case 'string':
           content.push(React.createElement(StringComponent,
                       {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
-                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, obj_id: uniqueId}));
+                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate}));
           break;
         case 'datetime':
           content.push(React.createElement(DateTimeComponent,
                       {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
-                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, obj_id: uniqueId}));
+                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate}));
           break;
         case 'related':
           content.push(React.createElement(RelatedComponent,
                       {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
-                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, handleSubmit: this.props.handleSubmit, unmount_element: this.props.unmount_element,  obj_id: uniqueId}));
+                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, handleSubmit: this.props.handleSubmit, unmount_element: this.props.unmount_element}));
           break;
         case 'integer':
           content.push(React.createElement(IntegerComponent,
                       {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
-                       key: uniquekey, schema: this.props.schema[key], display_state: this.state.display_state,update: this.handlechildUpdate, obj_id: uniqueId}));
+                       key: uniquekey, schema: this.props.schema[key], display_state: this.state.display_state,update: this.handlechildUpdate}));
           break;
       }
     }.bind(this));

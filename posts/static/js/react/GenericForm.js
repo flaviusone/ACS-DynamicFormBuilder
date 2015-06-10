@@ -79,28 +79,26 @@ var GenericForm = React.createClass({
       var fieldType = this.props.schema[key].type;
       refcounter++;
       uniquekey++;
-      uniquekey = _.uniqueId(); //TODO o sa scot asta
-      var uniqueId = _.uniqueId();
       switch(fieldType){
         case 'string':
           content.push(React.createElement(StringComponent,
                       {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
-                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, obj_id: uniqueId}));
+                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate}));
           break;
         case 'datetime':
           content.push(React.createElement(DateTimeComponent,
                       {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
-                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, obj_id: uniqueId}));
+                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate}));
           break;
         case 'related':
           content.push(React.createElement(RelatedComponent,
                       {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
-                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, handleSubmit: this.props.handleSubmit, unmount_element: this.props.unmount_element,  obj_id: uniqueId}));
+                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, handleSubmit: this.props.handleSubmit, unmount_element: this.props.unmount_element}));
           break;
         case 'integer':
           content.push(React.createElement(IntegerComponent,
                       {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
-                       key: uniquekey, schema: this.props.schema[key], display_state: this.state.display_state,update: this.handlechildUpdate, obj_id: uniqueId}));
+                       key: uniquekey, schema: this.props.schema[key], display_state: this.state.display_state,update: this.handlechildUpdate}));
           break;
       }
     }.bind(this));

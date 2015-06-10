@@ -112,13 +112,13 @@ STATICFILES_FINDERS = (
 
 BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'components')
 
-BOWER_INSTALLED_APPS = (
-    'jquery',
-    'underscore',
-    'lodash',
-    'react',
-    'bootstrap',
-)
+BOWER_INSTALLED_APPS = ('eonasdan-bootstrap-datetimepicker#4.7.14',
+                        'react#0.13.3',
+                        'lodash#3.7.0',
+                        'moment#2.10.3',
+                        'bootstrap#3.3.4',
+                        'jquery#2.1.4',
+                        'underscore#1.8.3')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/

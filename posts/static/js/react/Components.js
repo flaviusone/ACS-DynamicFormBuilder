@@ -24,8 +24,9 @@ var StringComponent = React.createClass({
       } else {
         if(!value) value=""; //Carpeala
         var nr_rows = Math.ceil(value.length/60);
-        field = <textarea rows={nr_rows} id={this.props.obj_id}
-        className="form-control" type="text" value={value} onChange={this.handleChange}/>;
+        field = <textarea rows={nr_rows}
+                          className="form-control" type="text"
+                          value={value} onChange={this.handleChange}/>;
       }
     } else {
       field = {value}
@@ -41,23 +42,20 @@ var StringComponent = React.createClass({
 });
 
 var DateTimeComponent = React.createClass({
-  componentDidMount: function() {
+  componentDidUpdate: function(){
     if(this.props.display_state=="edit"){
-      var id = '#'+this.props.obj_id;
-      // Initializez campul cu data ce vreau sa o modific.
       var init_data = {}
       if(this.props.val){
           init_data.defaultDate =  new Date(this.props.val)
-        }
-        // TODO this.getdomnode
-      $(function () { $(id).datetimepicker(init_data); });
+      }
+      var node = React.findDOMNode(this.refs.dateinput);
+      $(node).datetimepicker(init_data)
     }
   },
   getValue: function(){
-    var id = '#'+this.props.obj_id;
     var key = this.props.objkey;
-    var value = $(id).data("DateTimePicker").date()
-    // var value = this.state.value;
+    var node = React.findDOMNode(this.refs.dateinput);
+    var value = $(node).data("DateTimePicker").date()
     var obj = {};
     obj[key] = value;
     return obj;
@@ -68,7 +66,7 @@ var DateTimeComponent = React.createClass({
     var field;
 
     if(this.props.display_state == "edit"){
-      field = <input type='text' className="form-control" id={this.props.obj_id} />
+      field = <input type='text' className="form-control" ref="dateinput"/>
     } else {
       field = date.toUTCString();
     }
