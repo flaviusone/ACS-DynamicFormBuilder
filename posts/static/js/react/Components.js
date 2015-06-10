@@ -74,7 +74,7 @@ var DateTimeComponent = React.createClass({
       field = date.toUTCString();
     }
     return (
-      <div className="DateTimeComponent">
+      <div className="DateTimeComponent editor-datetime">
         <strong>{final_key}</strong>: {field}
       </div>
     );

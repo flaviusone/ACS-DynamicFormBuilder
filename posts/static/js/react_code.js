@@ -74,7 +74,7 @@ var DateTimeComponent = React.createClass({displayName: "DateTimeComponent",
       field = date.toUTCString();
     }
     return (
-      React.createElement("div", {className: "DateTimeComponent"}, 
+      React.createElement("div", {className: "DateTimeComponent editor-datetime"}, 
         React.createElement("strong", null, final_key), ": ", field
       )
     );
@@ -287,20 +287,13 @@ var FormBox = React.createClass({displayName: "FormBox",
   },
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
-    var formlist, addPanel;
+    var formlist;
 
     if (data_available) {
-      addPanel =React.createElement(GenericForm, {
-                    optional: "add", 
-                    display_state: "edit", 
-                    handleSubmit: this.props.handleSubmit, 
-                    unmount_element: this.props.unmount_element, 
-                    object: this.getEmptyObject(), 
-                    schema: this.state.schema.fields, 
-                    handleSubmit: this.handleCommentSubmit}
-                )
       formlist =React.createElement(FormList, {
-                    handleSubmit: this.handleCommentEdit, 
+                    handleSubmit: this.handleCommentSubmit, 
+                    handleEdit: this.handleCommentEdit, 
+                    getEmptyObject: this.getEmptyObject, 
                     unmount_element: this.unmount_element, 
                     resource: this.state.resource, 
                     schema: this.state.schema.fields}
@@ -314,13 +307,7 @@ var FormBox = React.createClass({displayName: "FormBox",
             React.createElement("h3", null, " Dynamic Form Builder Version 0.3 ")
           )
         ), 
-
-        React.createElement("div", {className: "row"}, 
-          React.createElement("div", {className: "col-md-3"}, 
-            addPanel
-          ), 
-          formlist
-        )
+        formlist
       )
       );
   }
@@ -337,18 +324,35 @@ var logged_user = "/posts/api/v1/author/1/";
 var FormList = React.createClass({displayName: "FormList",
   render: function() {
     var uniquekey=0; // For Reconciliation
+    addPanel =React.createElement(GenericForm, {
+              optional: "add", 
+              display_state: "edit", 
+              unmount_element: this.props.unmount_element, 
+              object: this.props.getEmptyObject(), 
+              schema: this.props.schema, 
+              handleSubmit: this.props.handleSubmit}
+          )
     var formNodes = this.props.resource.objects.map(function (object) {
       uniquekey++;
       return (
-        React.createElement("div", {key: uniquekey, className: "col-md-3"}, 
-          React.createElement(GenericForm, {display_state: "show", handleSubmit: this.props.handleSubmit, unmount_element: this.props.unmount_element, object: object, schema: this.props.schema}
+        React.createElement("div", {key: uniquekey, className: "childul"}, 
+          React.createElement(GenericForm, {display_state: "show", 
+                       handleSubmit: this.props.handleEdit, 
+                       unmount_element: this.props.unmount_element, 
+                       object: object, 
+                       schema: this.props.schema}
           )
         )
         );
     }.bind(this));
     return (
-      React.createElement("div", {className: "FormList"}, 
-      formNodes
+      React.createElement("div", {className: "parent"}, 
+
+        formNodes, 
+        React.createElement("div", {key: uniquekey++, className: "childul"}, 
+          addPanel
+        )
+
       )
       );
   }

@@ -100,20 +100,13 @@ var FormBox = React.createClass({
   },
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
-    var formlist, addPanel;
+    var formlist;
 
     if (data_available) {
-      addPanel =<GenericForm
-                    optional="add"
-                    display_state="edit"
-                    handleSubmit={this.props.handleSubmit}
-                    unmount_element={this.props.unmount_element}
-                    object={this.getEmptyObject()}
-                    schema={this.state.schema.fields}
-                    handleSubmit={this.handleCommentSubmit}>
-                </GenericForm>
       formlist =<FormList
-                    handleSubmit={this.handleCommentEdit}
+                    handleSubmit={this.handleCommentSubmit}
+                    handleEdit={this.handleCommentEdit}
+                    getEmptyObject={this.getEmptyObject}
                     unmount_element={this.unmount_element}
                     resource={this.state.resource}
                     schema={this.state.schema.fields}>
@@ -127,13 +120,7 @@ var FormBox = React.createClass({
             <h3> Dynamic Form Builder Version 0.3 </h3>
           </div>
         </nav>
-
-        <div className="row">
-          <div className="col-md-3">
-            {addPanel}
-          </div>
-          {formlist}
-        </div>
+        {formlist}
       </div>
       );
   }

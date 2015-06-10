@@ -16,13 +16,18 @@
  width:98%;
 }*/
 
-/*.parent{
+.parent{
   display: flex;
   display: -webkit-flex;
   flex-wrap: wrap;
-  align-items: stretch;
+  flex-direction: row;
+  justify-content:space-around;
 }
 
 .childul{
   width: 30%;
-}*/
+}
+
+.editor-datetime {
+      position: relative;
+}
