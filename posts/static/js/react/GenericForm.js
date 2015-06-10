@@ -74,12 +74,12 @@ var GenericForm = React.createClass({
     var refcounter=0;
     // Pentru fiecare prop din object
     _.forEach(this.props.object, function (val, key){
-      if(!this.props.schema[key]) return;
+      if(!this.props.schema[key]) return; //TODO maybe ?
       // Extrag type si apelez functia corespunzatoare
       var fieldType = this.props.schema[key].type;
       refcounter++;
       uniquekey++;
-      uniquekey = _.uniqueId();
+      uniquekey = _.uniqueId(); //TODO o sa scot asta
       var uniqueId = _.uniqueId();
       switch(fieldType){
         case 'string':

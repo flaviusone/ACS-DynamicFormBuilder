@@ -16,10 +16,13 @@
  width:98%;
 }*/
 
-/*.GenericForm{
-  display: -webkit-flex;
+/*.parent{
   display: flex;
+  display: -webkit-flex;
   flex-wrap: wrap;
   align-items: stretch;
 }
-*/
+
+.childul{
+  width: 30%;
+}*/

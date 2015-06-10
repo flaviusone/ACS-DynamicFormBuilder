@@ -49,6 +49,7 @@ var DateTimeComponent = React.createClass({
       if(this.props.val){
           init_data.defaultDate =  new Date(this.props.val)
         }
+        // TODO this.getdomnode
       $(function () { $(id).datetimepicker(init_data); });
     }
   },
@@ -110,6 +111,15 @@ var RelatedComponent = React.createClass({
     var obj = {};
     obj[key] = value;
     return obj;
+  },
+  componentWillReceiveProps: function(nextProps){
+    /**
+    * Check if we transition from edit to show
+    * Set explore to false
+    **/
+    if(this.props.display_state=="edit" &&  nextProps.display_state=="show"){
+      this.setState({explore: false});
+    }
   },
   loadCommentsFromServer: function(url) {
     // Load resource

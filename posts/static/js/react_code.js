@@ -49,6 +49,7 @@ var DateTimeComponent = React.createClass({displayName: "DateTimeComponent",
       if(this.props.val){
           init_data.defaultDate =  new Date(this.props.val)
         }
+        // TODO this.getdomnode
       $(function () { $(id).datetimepicker(init_data); });
     }
   },
@@ -110,6 +111,15 @@ var RelatedComponent = React.createClass({displayName: "RelatedComponent",
     var obj = {};
     obj[key] = value;
     return obj;
+  },
+  componentWillReceiveProps: function(nextProps){
+    /**
+    * Check if we transition from edit to show
+    * Set explore to false
+    **/
+    if(this.props.display_state=="edit" &&  nextProps.display_state=="show"){
+      this.setState({explore: false});
+    }
   },
   loadCommentsFromServer: function(url) {
     // Load resource
@@ -263,8 +273,11 @@ var FormBox = React.createClass({displayName: "FormBox",
       contentType: 'application/json',
       data: JSON.stringify(object),
       success: function(data) {
+        //TODO add _.cloneDeep
+        // sau react addons.update (react immutability helpers pe google)
         var new_data = this.state.resource;
         // Caut indexul vechului element care a fost updatat ca sa il suprascriu
+        // TODO _.findWhere in loc de asta de jos.
         var index = _.findIndex(this.state.resource.objects, _.matchesProperty('resource_uri', data.resource_uri));
         new_data.objects[index] = data;
         this.setState({resource: new_data});
@@ -305,9 +318,9 @@ var FormBox = React.createClass({displayName: "FormBox",
         ), 
 
         React.createElement("div", {className: "row"}, 
-        React.createElement("div", {className: "col-md-3"}, 
-          addPanel
-        ), 
+          React.createElement("div", {className: "col-md-3"}, 
+            addPanel
+          ), 
           formlist
         )
       )
@@ -320,6 +333,12 @@ React.render(
   document.getElementById('content')
   );
 var logged_user = "/posts/api/v1/author/1/";
+
+        // // <div className="row">
+        // <div className="parent">
+        // // <div className="col-md-3">
+        //   {addPanel}
+        // // </div>
 /**
 * List Container for GenericForm objects
 **/
@@ -420,12 +439,12 @@ var GenericForm = React.createClass({displayName: "GenericForm",
     var refcounter=0;
     // Pentru fiecare prop din object
     _.forEach(this.props.object, function (val, key){
-      if(!this.props.schema[key]) return;
+      if(!this.props.schema[key]) return; //TODO maybe ?
       // Extrag type si apelez functia corespunzatoare
       var fieldType = this.props.schema[key].type;
       refcounter++;
       uniquekey++;
-      uniquekey = _.uniqueId();
+      uniquekey = _.uniqueId(); //TODO o sa scot asta
       var uniqueId = _.uniqueId();
       switch(fieldType){
         case 'string':
