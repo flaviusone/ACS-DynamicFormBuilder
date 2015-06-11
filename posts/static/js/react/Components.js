@@ -47,9 +47,14 @@ var DateTimeComponent = React.createClass({
   },
   componentDidUpdate: function(){
     if(this.props.display_state=="edit"){
-      var init_data = {}
+      var init_data = {sideBySide: true,
+                      format: 'DD/MM/YYYY HH:mm',
+                      }
       if(this.props.val){
-          init_data.defaultDate =  new Date(this.props.val)
+          // Datetimepicker is stupid....hack needed
+          var dateNormal = new Date(this.props.val);
+          var dateUTC = new Date(dateNormal.getUTCFullYear(), dateNormal.getUTCMonth(), dateNormal.getUTCDate(),  dateNormal.getUTCHours(), dateNormal.getUTCMinutes(), dateNormal.getUTCSeconds());
+          init_data.defaultDate =  dateUTC
       }
       var node = React.findDOMNode(this.refs.dateinput);
       $(node).datetimepicker(init_data)
