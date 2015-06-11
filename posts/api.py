@@ -28,3 +28,8 @@ class PostResource(ModelResource):
         resource_name = 'post'
         authorization = Authorization()
         always_return_data = True
+
+    def build_schema(self):
+        base_schema = super(ModelResource, self).build_schema()
+        base_schema['fields']['author']['resource'] = "/posts/api/v1/author/"
+        return base_schema
