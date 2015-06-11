@@ -87,10 +87,10 @@ var FormBox = React.createClass({
       contentType: 'application/json',
       data: JSON.stringify(object),
       success: function(data) {
-        var new_data = _.cloneDeep(this.state.resource);
         // Update the element with response from server
-        var newObj = _.findWhere(new_data, {'resource_uri' : data.resource_uri});
-        newObj = data;
+        var new_data = _.cloneDeep(this.state.resource);
+        var index = _.findIndex(new_data.objects, 'resource_uri', data.resource_uri);
+        new_data.objects[index] = data;
         this.setState({resource: new_data});
       }.bind(this),
       error: function(xhr, status, err) {

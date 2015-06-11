@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'djangobower',
     'posts',
     'tastypie',
+    'django_extensions',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -117,6 +118,7 @@ BOWER_INSTALLED_APPS = ('eonasdan-bootstrap-datetimepicker#4.7.14',
                         'lodash#3.7.0',
                         'moment#2.10.3',
                         'bootstrap#3.3.4',
+                        'react-bootstrap',
                         'jquery#2.1.4',
                         'underscore#1.8.3')
 

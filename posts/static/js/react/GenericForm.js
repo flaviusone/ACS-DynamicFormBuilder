@@ -91,9 +91,12 @@ var GenericForm = React.createClass({
                        key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate}));
           break;
         case 'related':
+          var mainResource = this.props.schema[key].resource;
           content.push(React.createElement(RelatedComponent,
                       {ref: refcounter, val: val, objkey: key, schema: this.props.schema[key],
-                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate, handleSubmit: this.props.handleSubmit, unmount_element: this.props.unmount_element}));
+                       key: uniquekey, display_state: this.state.display_state,update: this.handlechildUpdate,
+                       handleSubmit: this.props.handleSubmit, unmount_element: this.props.unmount_element,
+                       mainResource: mainResource}));
           break;
         case 'integer':
           content.push(React.createElement(IntegerComponent,

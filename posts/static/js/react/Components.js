@@ -2,6 +2,9 @@ var StringComponent = React.createClass({
   getInitialState: function() {
     return {value: this.props.val};
   },
+  componentWillReceiveProps: function(nextProps){
+    this.setState({value: this.props.val});
+  },
   getValue: function(){
     var key = this.props.objkey;
     var value = this.state.value;
@@ -108,12 +111,14 @@ var IntegerComponent = React.createClass({
 var RelatedComponent = React.createClass({
   getInitialState: function() {
     return {resource: {objects: null},
+            dropdownData: {objects: null},
             schema: {fields: null},
-            explore: false};
+            explore: false,
+            dropdownTitle: this.props.val};
   },
   getValue: function(){
     var key = this.props.objkey;
-    var value = this.props.val;
+    var value = this.state.dropdownTitle;
     var obj = {};
     obj[key] = value;
     return obj;
@@ -124,7 +129,11 @@ var RelatedComponent = React.createClass({
     * Set explore to false
     **/
     if(this.props.display_state=="edit" &&  nextProps.display_state=="show"){
-      this.setState({explore: false});
+      this.setState({explore: false, dropdownTitle: this.props.val});
+    }
+    if(this.props.display_state=="show" &&  nextProps.display_state=="edit"){
+      this.loadDataIntoDropdown();
+      this.setState({dropdownTitle: this.props.val});
     }
   },
   loadCommentsFromServer: function(url) {
@@ -153,26 +162,60 @@ var RelatedComponent = React.createClass({
         this.setState({schema: data});
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error(url, status, err.toString());
+      }.bind(this)
+    });
+  },
+  loadDataIntoDropdown: function(){
+    $.ajax({
+      url: this.props.mainResource,
+      type: 'GET',
+      contentType: 'application/json',
+      dataType: 'json',
+      success: function(data, textStatus, jqXHR) {
+        this.setState({dropdownData: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(url, status, err.toString());
       }.bind(this)
     });
   },
   handleEditPress: function(){
-    this.loadCommentsFromServer(this.props.val)
     if(this.state.explore == false){
       this.setState({explore: true})
+      this.loadCommentsFromServer(this.state.dropdownTitle)
     } else {
       this.setState({explore: false})
     }
+  },
+  onSelectAlert: function(eventKey, href, target) {
+    this.setState({dropdownTitle: eventKey, explore: false})
   },
   render: function() {
     var startCaseKey = _.startCase(this.props.objkey);
     var object = this.state.resource;
     var schema = this.state.schema.fields;
     var content = [];
-    var edit_button;
+    var edit_button, dropdown;
+
+    var menuItems = [];
+    if(this.state.dropdownData.objects){
+      var eventKey = 1;
+      _.forEach(this.state.dropdownData.objects, function(obj){
+        var MenuItem = ReactBootstrap.MenuItem;
+        var menuItem = <MenuItem key={eventKey} eventKey={obj.resource_uri} onSelect={this.onSelectAlert}>{obj.username}</MenuItem>
+        menuItems.push(menuItem);
+        eventKey++;
+      }.bind(this));
+    }
+
+    dropdown = this.props.val;
 
     if(this.props.display_state == "edit"){
+      // Setup Dropdown
+      var DropdownButton = ReactBootstrap.DropdownButton;
+      dropdown = <DropdownButton title={this.state.dropdownTitle}> {menuItems} </DropdownButton>
+      // Edit button for exploring
       edit_button = <button type="button" onClick={this.handleEditPress} className="btn btn-default">Edit</button>
     }
 
@@ -184,9 +227,10 @@ var RelatedComponent = React.createClass({
 
     return (
       <div className="RelatedComponent">
-        <strong>{startCaseKey}</strong> : {this.props.val} {edit_button}
+        <strong>{startCaseKey}</strong> : {dropdown} {edit_button}
         {content}
       </div>
     );
   }
 });
+

@@ -12,7 +12,7 @@ class UserResource(ModelResource):
         queryset = User.objects.all()
         resource_name = 'author'
         excludes = [
-            'email', 'password', 'is_active', 'is_staff', 'is_superuser']
+            'password', 'is_active', 'is_staff', 'is_superuser']
         filtering = {
             'username': ALL,
         }
