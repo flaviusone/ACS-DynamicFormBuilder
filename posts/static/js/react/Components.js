@@ -123,6 +123,12 @@ var RelatedComponent = React.createClass({
     obj[key] = value;
     return obj;
   },
+  componentDidMount: function(){
+    // For the Add form
+    if(this.props.display_state=="edit"){
+      this.loadDataIntoDropdown();
+    }
+  },
   componentWillReceiveProps: function(nextProps){
     /**
     * Check if we transition from edit to show
@@ -203,6 +209,7 @@ var RelatedComponent = React.createClass({
       var eventKey = 1;
       _.forEach(this.state.dropdownData.objects, function(obj){
         var MenuItem = ReactBootstrap.MenuItem;
+        //TODO aici nu am sa las asa pentru ca nu e generic
         var menuItem = <MenuItem key={eventKey} eventKey={obj.resource_uri} onSelect={this.onSelectAlert}>{obj.username}</MenuItem>
         menuItems.push(menuItem);
         eventKey++;
