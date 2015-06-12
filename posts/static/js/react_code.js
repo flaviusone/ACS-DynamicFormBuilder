@@ -3,7 +3,7 @@ var StringComponent = React.createClass({displayName: "StringComponent",
     return {value: this.props.val};
   },
   componentWillReceiveProps: function(nextProps){
-    this.setState({value: this.props.val});
+    this.setState({value: nextProps.val});
   },
   getValue: function(){
     var key = this.props.objkey;
@@ -389,15 +389,13 @@ var FormBox = React.createClass({displayName: "FormBox",
         React.createElement("nav", {className: "navbar navbar-default navbar-fixed-top"}, 
           React.createElement("div", {className: "navbar-header"}, 
             React.createElement("a", {className: "navbar-brand", href: "#"}, "Dynamic Form Builder Version 0.4")
-        ), 
-          React.createElement("div", {className: "container"}, 
-            React.createElement("div", {className: "row"}, 
-              React.createElement("div", {className: "col-md-5"}, 
-              React.createElement("form", {onSubmit: this.handleRender, className: "navbar-form navbar-right", role: "search"}, 
-                  resourceSelector, 
-                  renderButton
-              )
-              )
+          ), 
+          React.createElement("div", {className: "row"}, 
+            React.createElement("div", {className: "col-md-5"}, 
+            React.createElement("form", {onSubmit: this.handleRender, className: "navbar-form navbar-right", role: "search"}, 
+                resourceSelector, 
+                renderButton
+            )
             )
           )
         ), 

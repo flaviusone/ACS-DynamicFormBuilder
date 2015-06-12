@@ -3,7 +3,7 @@ var StringComponent = React.createClass({
     return {value: this.props.val};
   },
   componentWillReceiveProps: function(nextProps){
-    this.setState({value: this.props.val});
+    this.setState({value: nextProps.val});
   },
   getValue: function(){
     var key = this.props.objkey;

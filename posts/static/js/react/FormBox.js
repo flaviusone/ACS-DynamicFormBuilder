@@ -143,15 +143,13 @@ var FormBox = React.createClass({
         <nav className="navbar navbar-default navbar-fixed-top">
           <div className="navbar-header">
             <a className="navbar-brand" href="#">Dynamic Form Builder Version 0.4</a>
-        </div>
-          <div className="container">
-            <div className="row">
-              <div className="col-md-5">
-              <form onSubmit={this.handleRender} className="navbar-form navbar-right" role="search">
-                  {resourceSelector}
-                  {renderButton}
-              </form>
-              </div>
+          </div>
+          <div className="row">
+            <div className="col-md-5">
+            <form onSubmit={this.handleRender} className="navbar-form navbar-right" role="search">
+                {resourceSelector}
+                {renderButton}
+            </form>
             </div>
           </div>
         </nav>
