@@ -138,7 +138,9 @@ var RelatedComponent = React.createClass({displayName: "RelatedComponent",
       this.setState({explore: false, dropdownTitle: this.props.val});
     }
     if(this.props.display_state=="show" &&  nextProps.display_state=="edit"){
-      this.loadDataIntoDropdown();
+      if(!this.state.dropdownData.objects){
+        this.loadDataIntoDropdown();
+      }
       this.setState({dropdownTitle: this.props.val});
     }
   },
@@ -251,6 +253,10 @@ var FormBox = React.createClass({displayName: "FormBox",
             schema: {fields: null},
             url: null};
   },
+  componentDidMount: function(){
+    // Hack ca sa nu mai trebuiasca sa apas pe buton la refresh
+    this.loadCommentsFromServer("/posts/api/v1/post/");
+  },
   shouldComponentUpdate: function(nextProps, nextState) {
     // Don't rerender untill objects and schema are available
     return (nextState.resource.objects && nextState.schema.fields )
@@ -278,7 +284,6 @@ var FormBox = React.createClass({displayName: "FormBox",
   },
   loadCommentsFromServer: function(url) {
     if(!url) return;
-    console.log(url)
     // Load resource
     $.ajax({
       url: url,

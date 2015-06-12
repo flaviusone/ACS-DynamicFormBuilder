@@ -17,6 +17,7 @@ class UserResource(ModelResource):
             'username': ALL,
         }
         authorization = Authorization()
+        always_return_data = True
 
 
 class PostResource(ModelResource):

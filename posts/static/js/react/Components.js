@@ -138,7 +138,9 @@ var RelatedComponent = React.createClass({
       this.setState({explore: false, dropdownTitle: this.props.val});
     }
     if(this.props.display_state=="show" &&  nextProps.display_state=="edit"){
-      this.loadDataIntoDropdown();
+      if(!this.state.dropdownData.objects){
+        this.loadDataIntoDropdown();
+      }
       this.setState({dropdownTitle: this.props.val});
     }
   },

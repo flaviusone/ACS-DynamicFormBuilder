@@ -7,6 +7,10 @@ var FormBox = React.createClass({
             schema: {fields: null},
             url: null};
   },
+  componentDidMount: function(){
+    // Hack ca sa nu mai trebuiasca sa apas pe buton la refresh
+    this.loadCommentsFromServer("/posts/api/v1/post/");
+  },
   shouldComponentUpdate: function(nextProps, nextState) {
     // Don't rerender untill objects and schema are available
     return (nextState.resource.objects && nextState.schema.fields )
@@ -34,7 +38,6 @@ var FormBox = React.createClass({
   },
   loadCommentsFromServer: function(url) {
     if(!url) return;
-    console.log(url)
     // Load resource
     $.ajax({
       url: url,
