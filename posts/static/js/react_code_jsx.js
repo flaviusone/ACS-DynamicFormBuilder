@@ -248,7 +248,8 @@ var RelatedComponent = React.createClass({
 var FormBox = React.createClass({
   getInitialState: function() {
     return {resource: {objects: null},
-            schema: {fields: null}};
+            schema: {fields: null},
+            url: null};
   },
   shouldComponentUpdate: function(nextProps, nextState) {
     // Don't rerender untill objects and schema are available
@@ -261,9 +262,6 @@ var FormBox = React.createClass({
     });
     this.setState(resource);
   },
-  componentDidMount: function() {
-    this.loadCommentsFromServer();
-  },
   getEmptyObject: function() {
     // Gets an empty object corresponding to the schema
     // Used on the Add form
@@ -274,27 +272,29 @@ var FormBox = React.createClass({
         object[key] = null;
       });
     object.author = logged_user;
-    object.resource_uri = this.props.url;
+    object.resource_uri = this.state.url;
     }
     return object;
   },
-  loadCommentsFromServer: function() {
+  loadCommentsFromServer: function(url) {
+    if(!url) return;
+    console.log(url)
     // Load resource
     $.ajax({
-      url: this.props.url,
+      url: url,
       type: 'GET',
       contentType: 'application/json',
       dataType: 'json',
       success: function(data, textStatus, jqXHR) {
-        this.setState({resource: data});
+        this.setState({resource: data, url: url});
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error(url, status, err.toString());
       }.bind(this)
     });
     // Load schema
     $.ajax({
-      url: this.props.url + 'schema',
+      url: url + 'schema',
       type: 'GET',
       contentType: 'application/json',
       dataType: 'json',
@@ -302,13 +302,13 @@ var FormBox = React.createClass({
         this.setState({schema: data});
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error(url, status, err.toString());
       }.bind(this)
     });
   },
   handleCommentSubmit: function(object) {
     $.ajax({
-      url: this.props.url,
+      url: this.state.url,
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
@@ -319,7 +319,7 @@ var FormBox = React.createClass({
         this.setState({resource: new_data});
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error(this.state.url, status, err.toString());
       }.bind(this)
     });
   },
@@ -338,14 +338,18 @@ var FormBox = React.createClass({
         this.setState({resource: new_data});
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error(object.resource_uri, status, err.toString());
       }.bind(this)
     });
+  },
+  handleRender: function(e) {
+    e.preventDefault();
+    var url = this.refs.gameTitle.refs.input.getDOMNode().value
+    this.loadCommentsFromServer(url);
   },
   render: function() {
     var data_available = (this.state.resource.objects && this.state.schema.fields);
     var formlist;
-
     if (data_available) {
       formlist =<FormList
                     handleSubmit={this.handleCommentSubmit}
@@ -357,11 +361,39 @@ var FormBox = React.createClass({
                 </FormList>;
     }
 
+    var Input = ReactBootstrap.Input;
+    var resourceSelector = (
+    <Input ref='gameTitle' type='select' placeholder='Select endpoint'>
+      <option value='/posts/api/v1/post/'>/posts/api/v1/post/</option>
+      <option value='/posts/api/v1/author/'>/posts/api/v1/author/</option>
+    </Input>)
+    var ButtonInput = ReactBootstrap.ButtonInput;
+    var renderButton =  <ButtonInput type='submit' value='Render' />
+
+    var Navbar = ReactBootstrap.Navbar;
+    var NavItem = ReactBootstrap.NavItem;
+    var Nav= ReactBootstrap.Nav;
+    var navBar = (<Navbar brand='Dynamic Form Builder 0.4'>
+    <Nav>
+    {resourceSelector}
+    </Nav>
+    </Navbar>)
+
     return (
       <div className="formBox">
         <nav className="navbar navbar-default navbar-fixed-top">
+          <div className="navbar-header">
+            <a className="navbar-brand" href="#">Dynamic Form Builder Version 0.4</a>
+        </div>
           <div className="container">
-            <h3> Dynamic Form Builder Version 0.3 </h3>
+            <div className="row">
+              <div className="col-md-5">
+              <form onSubmit={this.handleRender} className="navbar-form navbar-right" role="search">
+                  {resourceSelector}
+                  {renderButton}
+              </form>
+              </div>
+            </div>
           </div>
         </nav>
         {formlist}
@@ -370,8 +402,9 @@ var FormBox = React.createClass({
   }
 });
 
+
 React.render(
-  <FormBox url='/posts/api/v1/post/'/>,
+  <FormBox />,
   document.getElementById('content')
   );
 var logged_user = "/posts/api/v1/author/1/";
