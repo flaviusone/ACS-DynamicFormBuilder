@@ -212,7 +212,7 @@ var RelatedComponent = React.createClass({
       _.forEach(this.state.dropdownData.objects, function(obj){
         var MenuItem = ReactBootstrap.MenuItem;
         //TODO aici nu am sa las asa pentru ca nu e generic
-        var menuItem = <MenuItem key={eventKey} eventKey={obj.resource_uri} onSelect={this.onSelectAlert}>{obj.username}</MenuItem>
+        var menuItem = <MenuItem key={eventKey} eventKey={obj.resource_uri} onSelect={this.onSelectAlert}>{obj.resource_uri}</MenuItem>
         menuItems.push(menuItem);
         eventKey++;
       }.bind(this));
@@ -236,7 +236,9 @@ var RelatedComponent = React.createClass({
 
     return (
       <div className="RelatedComponent">
-        <strong>{startCaseKey}</strong> : {dropdown} {edit_button}
+
+          <strong>{startCaseKey}</strong> :
+          {dropdown} {edit_button}
         {content}
       </div>
     );

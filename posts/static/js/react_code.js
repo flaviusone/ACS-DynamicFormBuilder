@@ -212,7 +212,7 @@ var RelatedComponent = React.createClass({displayName: "RelatedComponent",
       _.forEach(this.state.dropdownData.objects, function(obj){
         var MenuItem = ReactBootstrap.MenuItem;
         //TODO aici nu am sa las asa pentru ca nu e generic
-        var menuItem = React.createElement(MenuItem, {key: eventKey, eventKey: obj.resource_uri, onSelect: this.onSelectAlert}, obj.username)
+        var menuItem = React.createElement(MenuItem, {key: eventKey, eventKey: obj.resource_uri, onSelect: this.onSelectAlert}, obj.resource_uri)
         menuItems.push(menuItem);
         eventKey++;
       }.bind(this));
@@ -236,7 +236,9 @@ var RelatedComponent = React.createClass({displayName: "RelatedComponent",
 
     return (
       React.createElement("div", {className: "RelatedComponent"}, 
-        React.createElement("strong", null, startCaseKey), " : ", dropdown, " ", edit_button, 
+
+          React.createElement("strong", null, startCaseKey), " :", 
+          dropdown, " ", edit_button, 
         content
       )
     );
@@ -255,7 +257,7 @@ var FormBox = React.createClass({displayName: "FormBox",
   },
   componentDidMount: function(){
     // Hack ca sa nu mai trebuiasca sa apas pe buton la refresh
-    this.loadCommentsFromServer("/posts/api/v1/post/");
+    //this.loadCommentsFromServer("/posts/api/v1/post/");
   },
   shouldComponentUpdate: function(nextProps, nextState) {
     // Don't rerender untill objects and schema are available
@@ -276,8 +278,12 @@ var FormBox = React.createClass({displayName: "FormBox",
     if(data_available){
       _.forEach(this.state.schema.fields, function (val, key){
         object[key] = null;
+        //Daca e related. Atunci populeaza cu un placeholder
+        if(val.resource){
+          object.author = "Select resource";
+        }
       });
-    object.author = logged_user;
+    // object.author = logged_user;
     object.resource_uri = this.state.url;
     }
     return object;
@@ -349,7 +355,7 @@ var FormBox = React.createClass({displayName: "FormBox",
   },
   handleRender: function(e) {
     e.preventDefault();
-    var url = this.refs.gameTitle.refs.input.getDOMNode().value
+    var url = "/posts" + this.refs.gameTitle.refs.input.getDOMNode().value
     this.loadCommentsFromServer(url);
   },
   render: function() {
@@ -369,8 +375,10 @@ var FormBox = React.createClass({displayName: "FormBox",
     var Input = ReactBootstrap.Input;
     var resourceSelector = (
     React.createElement(Input, {ref: "gameTitle", type: "select", placeholder: "Select endpoint"}, 
-      React.createElement("option", {value: "/posts/api/v1/post/"}, "/posts/api/v1/post/"), 
-      React.createElement("option", {value: "/posts/api/v1/author/"}, "/posts/api/v1/author/")
+      React.createElement("option", {value: "/api/v1/post/"}, "/api/v1/post/"), 
+      React.createElement("option", {value: "/api/v1/author/"}, "/api/v1/author/"), 
+      React.createElement("option", {value: "/api/v2/manufacturer/"}, "/api/v2/manufacturer/"), 
+      React.createElement("option", {value: "/api/v2/car/"}, "/api/v2/car/")
     ))
     var ButtonInput = ReactBootstrap.ButtonInput;
     var renderButton =  React.createElement(ButtonInput, {type: "submit", value: "Render"})
@@ -410,7 +418,7 @@ React.render(
   React.createElement(FormBox, null),
   document.getElementById('content')
   );
-var logged_user = "/posts/api/v1/author/1/";
+// var logged_user = "/posts/api/v1/author/1/";
 /**
 * List Container for GenericForm objects
 **/

@@ -9,7 +9,7 @@ var FormBox = React.createClass({
   },
   componentDidMount: function(){
     // Hack ca sa nu mai trebuiasca sa apas pe buton la refresh
-    this.loadCommentsFromServer("/posts/api/v1/post/");
+    //this.loadCommentsFromServer("/posts/api/v1/post/");
   },
   shouldComponentUpdate: function(nextProps, nextState) {
     // Don't rerender untill objects and schema are available
@@ -30,8 +30,12 @@ var FormBox = React.createClass({
     if(data_available){
       _.forEach(this.state.schema.fields, function (val, key){
         object[key] = null;
+        //Daca e related. Atunci populeaza cu un placeholder
+        if(val.resource){
+          object.author = "Select resource";
+        }
       });
-    object.author = logged_user;
+    // object.author = logged_user;
     object.resource_uri = this.state.url;
     }
     return object;
@@ -103,7 +107,7 @@ var FormBox = React.createClass({
   },
   handleRender: function(e) {
     e.preventDefault();
-    var url = this.refs.gameTitle.refs.input.getDOMNode().value
+    var url = "/posts" + this.refs.gameTitle.refs.input.getDOMNode().value
     this.loadCommentsFromServer(url);
   },
   render: function() {
@@ -123,8 +127,10 @@ var FormBox = React.createClass({
     var Input = ReactBootstrap.Input;
     var resourceSelector = (
     <Input ref='gameTitle' type='select' placeholder='Select endpoint'>
-      <option value='/posts/api/v1/post/'>/posts/api/v1/post/</option>
-      <option value='/posts/api/v1/author/'>/posts/api/v1/author/</option>
+      <option value='/api/v1/post/'>/api/v1/post/</option>
+      <option value='/api/v1/author/'>/api/v1/author/</option>
+      <option value='/api/v2/manufacturer/'>/api/v2/manufacturer/</option>
+      <option value='/api/v2/car/'>/api/v2/car/</option>
     </Input>)
     var ButtonInput = ReactBootstrap.ButtonInput;
     var renderButton =  <ButtonInput type='submit' value='Render' />
@@ -164,4 +170,4 @@ React.render(
   <FormBox />,
   document.getElementById('content')
   );
-var logged_user = "/posts/api/v1/author/1/";
+// var logged_user = "/posts/api/v1/author/1/";

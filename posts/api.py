@@ -1,5 +1,5 @@
 from tastypie.resources import ModelResource
-from posts.models import Post
+from posts.models import Post, CarManufacturer, Car
 from tastypie import fields
 from tastypie.authorization import Authorization
 from django.contrib.auth.models import User
@@ -33,4 +33,29 @@ class PostResource(ModelResource):
     def build_schema(self):
         base_schema = super(ModelResource, self).build_schema()
         base_schema['fields']['author']['resource'] = "/posts/api/v1/author/"
+        return base_schema
+
+
+class ManufacturerResource(ModelResource):
+
+    class Meta:
+        queryset = CarManufacturer.objects.all()
+        resource_name = 'manufacturer'
+        authorization = Authorization()
+        always_return_data = True
+
+
+class CarResource(ModelResource):
+
+    manufacturer = fields.ForeignKey(ManufacturerResource, 'manufacturer')
+
+    class Meta:
+        queryset = Car.objects.all()
+        resource_name = 'car'
+        authorization = Authorization()
+        always_return_data = True
+
+    def build_schema(self):
+        base_schema = super(ModelResource, self).build_schema()
+        base_schema['fields']['manufacturer']['resource'] = "/posts/api/v2/manufacturer/"
         return base_schema

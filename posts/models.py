@@ -1,11 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-# from tastypie.utils.timezone import now
-# Create your models here.
 
 
 class Post(models.Model):
-    # TODO: Define fields here
     title = models.CharField(max_length=200, help_text='Title: ')
     author = models.ForeignKey(User, help_text='User')
     created_at = models.DateTimeField(
@@ -30,3 +27,39 @@ class Post(models.Model):
     #     return ('')
 
     # TODO: Define custom methods here
+
+
+class CarManufacturer(models.Model):
+    name = models.CharField(max_length=200, help_text='Name: ')
+    founded = models.DateField(help_text='Founded: ')
+    headquartered = models.CharField(
+        max_length=200, help_text='Headquarters: ')
+    description = models.TextField(help_text='Description: ')
+
+    class Meta:
+        verbose_name = "CarManufacturer"
+        verbose_name_plural = "CarManufacturers"
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
+class Car(models.Model):
+    model = models.CharField(max_length=200, help_text='model: ')
+    manufacturer = models.ForeignKey(CarManufacturer, help_text='manufacturer')
+    fabrication_date = models.DateField(help_text='fabrication_date: ')
+    description = models.TextField(help_text='Description: ')
+
+    class Meta:
+        verbose_name = "Car"
+        verbose_name_plural = "Car"
+
+    def __unicode__(self):
+        return self.model
+
+    def __str__(self):
+        return self.model
+
+
